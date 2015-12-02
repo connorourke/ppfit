@@ -4,12 +4,25 @@ import os
 from shutil import copyfile
 from glob import glob
 
+def class Fitting_Parameter:
+
+    def __init__( self, string, initial, max_delta, min_value, max_value ):
+        self.string = string
+        self.initial_value = initial
+        self.max_delta = max_delta
+        self.limits = [ min_value, max_value ]
+    
 def substitute_parameter( input, to_sub ):
     for k, v in to_sub.items():
         input = re.sub( r"{}".format( k ), str( v ), input )
     return input
 
 def fitting_params_from_fitabinitioin():
+    '''
+    Parses 'fitabinitio.in' to obtain the fitting parameters to be adjusted in the fitting procedure.
+    TODO check what this returns, and the format
+    TODO would be clearer to have a FittingParameter class, that stores the substitution string, min, max, and step size
+    '''
     filename = 'fitabinitio.in'
     with open( filename, 'r') as f:
         data = f.read()
