@@ -1,4 +1,2 @@
 # AI stresses, 0 means that the file is not used, 1 that it is
-cubic.stress 1
-tet.stress 1
-rhombo.stress 1
+LLZO01_HSE.stress 1

@@ -1,0 +1,225 @@
+  &FORCEFIELD
+#
+   &SPLINE
+     RCUT_NB                     10.5
+     EMAX_SPLINE                 1000.0
+    &END SPLINE
+#
+   &NONBONDED
+#
+#########################################
+#	    BMHFTD de LLZO              #
+#########################################
+#
+    &BMHFTD
+     ATOMS      		O O
+     A                          B11
+     B                          A11
+     C                          1.8226524200680616
+     D                          7.625161753143967
+     BD   			2.4566310140216943
+    &END BMHFTD
+    &BMHFTD
+     ATOMS      		O La
+     A                          B13
+     B                          A13
+     C                          1.2517079384139898
+     D                          4.4951558399582581
+     BD   			2.7589856003628257
+    &END BMHFTD
+    &BMHFTD
+     ATOMS      		O Zr
+     A                          B1Z
+     B                          A1Z
+     C                          0.46114746595136552
+     D                          1.6664668025016252
+     BD   			3.0613401867039576
+    &END BMHFTD
+    &BMHFTD
+     ATOMS      		O Li
+     A                          B12
+     B                          A12
+     C                          0.0               
+     D                          0.0               
+     BD   			0.0               
+    &END BMHFTD
+    &BMHFTD
+     ATOMS      		La La
+     A                          1.00000000000E-04
+     B                          9.4485808231603627
+     C                          0.0               
+     D                          0.0               
+     BD   			0.0               
+    &END BMHFTD
+    &BMHFTD
+     ATOMS      		La Zr
+     A                          1.00000000000E-04
+     B                          9.4485808231603627
+     C                          0.0               
+     D                          0.0               
+     BD   			0.0               
+    &END BMHFTD
+    &BMHFTD
+     ATOMS      		La Li
+     A                          1.00000000000E-04
+     B                          9.4485808231603627
+     C                          0.0               
+     D                          0.0               
+     BD   			0.0               
+    &END BMHFTD
+    &BMHFTD
+     ATOMS      		Zr Zr
+     A                          1.00000000000E-04
+     B                          9.4485808231603627
+     C                          0.0               
+     D                          0.0               
+     BD   			0.0               
+    &END BMHFTD
+    &BMHFTD
+     ATOMS      		Zr Li
+     A                          1.00000000000E-04
+     B                          9.4485808231603627
+     C                          0.0               
+     D                          0.0               
+     BD   			0.0               
+    &END BMHFTD
+    &BMHFTD
+     ATOMS      		Li Li
+     A                          1.00000000000E-04
+     B                          9.4485808231603627
+     C                          0.0               
+     D                          0.0               
+     BD   			0.0               
+    &END BMHFTD
+   &END NONBONDED
+#
+##########################################################
+#							#
+#			Les charges			#
+#							#
+#########################################################
+#
+   &CHARGE
+    ATOM 			O
+    CHARGE			-2.0000
+   &END CHARGE
+#
+   &CHARGE
+    atom 			La
+    CHARGE 			+3.0000
+   &END CHARGE
+   &CHARGE
+    atom 			Zr
+    CHARGE 			+4.0000
+   &END CHARGE
+   &CHARGE
+    atom 			Li
+    CHARGE 			+1.0000
+   &END CHARGE
+#
+#########################################################
+#							#
+#			Les dipoles			#
+#							#
+#########################################################
+#
+   &DIPOLE
+    ATOM 			O
+    APOL 		        ALPHA1
+    &DAMPING
+     ORDER                      4
+     TYPE                       Tang-Toennies
+     ATOM                       O
+     BIJ                        BANAN
+     CIJ                        CANAN
+    &END DAMPING
+    &DAMPING
+     ORDER                      4
+     TYPE                       Tang-Toennies
+     ATOM                       La
+     BIJ                        BDIP13
+     CIJ                        CDIP13
+    &END DAMPING
+    &DAMPING
+     ORDER                      4
+     TYPE                       Tang-Toennies
+     ATOM                       Zr
+     BIJ                        BDIP1Z
+     CIJ                        CDIP1Z
+    &END DAMPING
+    &DAMPING
+     ORDER 			4
+     TYPE 			Tang-Toennies
+     ATOM 			Li
+     BIJ 			BDIP12
+     CIJ 			CDIP12
+    &END DAMPING
+   &END DIPOLE
+#
+   &DIPOLE
+    ATOM 			La
+    APOL 		        ALPHA3
+    &DAMPING
+     ORDER                      4
+     TYPE                       Tang-Toennies
+     ATOM                       O
+     BIJ                        BDIP13
+     CIJ                        CDIP31
+    &END DAMPING
+    &DAMPING
+     ORDER                      4
+     TYPE                       Tang-Toennies
+     ATOM                       La
+     BIJ                        0.0               
+     CIJ                        0.0               
+    &END DAMPING
+    &DAMPING
+     ORDER                      4
+     TYPE                       Tang-Toennies
+     ATOM                       Zr
+     BIJ                        0.0               
+     CIJ                        0.0               
+    &END DAMPING
+    &DAMPING
+     ORDER 			4
+     TYPE 			Tang-Toennies
+     ATOM 			Li
+     BIJ                        0.0               
+     CIJ                        0.0               
+    &END DAMPING
+   &END DIPOLE
+##
+   &DIPOLE
+    ATOM 			Zr
+    APOL 			ALPHAZ
+    &DAMPING
+     ORDER                      4
+     TYPE                       Tang-Toennies
+     ATOM                       O
+     BIJ                        BDIP1Z
+     CIJ                        CDIPZ1
+    &END DAMPING
+    &DAMPING
+     ORDER                      4
+     TYPE                       Tang-Toennies
+     ATOM                       La
+     BIJ                        0.0               
+     CIJ                        0.0               
+    &END DAMPING
+    &DAMPING
+     ORDER                      4
+     TYPE                       Tang-Toennies
+     ATOM                       Zr
+     BIJ                        0.0               
+     CIJ                        0.0               
+    &END DAMPING
+    &DAMPING
+     ORDER 			4
+     TYPE 			Tang-Toennies
+     ATOM 			Li
+     BIJ                        0.0               
+     CIJ                        0.0               
+    &END DAMPING
+   &END DIPOLE
+  &END FORCEFIELD
+#
