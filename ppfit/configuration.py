@@ -4,7 +4,7 @@ import os
 from shutil import copyfile
 from glob import glob
 
-def class Fitting_Parameter:
+class Fitting_Parameter:
 
     def __init__( self, string, initial, max_delta, min_value, max_value ):
         self.string = string
@@ -33,6 +33,7 @@ def initialise_potential_file( potential_file ):
         potential_input = file_in.read()
     to_sub = {}
     potential_fitting_parameters = fitting_params_from_fitabinitioin()
+    print( potential_fitting_parameters )
     for i, string in enumerate( potential_fitting_parameters ):
         to_sub[ string ] = sys.argv[ i+1 ]
     potential_to_run = substitute_parameter( potential_input, to_sub )
