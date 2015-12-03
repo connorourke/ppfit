@@ -40,6 +40,13 @@ def initialise_potential_file( potential_file ):
     with open( 'potential.inpt', 'w' ) as file_out:
         file_out.write( potential_to_run )
 
+def initialise_potential_file_with_values( potential_file, parameter_values ):
+    with open( potential_file, 'r' ) as file_in:
+        potential_input = file_in.read()
+    potential_to_run = substitute_parameter( potential_input, parameter_values )
+    with open( 'potential.inpt', 'w' ) as file_out:
+        file_out.write( potential_to_run )
+
 class Configuration:
 
     def __init__( self, runtime_file, restart_file, forces_file, nsupercell ):
