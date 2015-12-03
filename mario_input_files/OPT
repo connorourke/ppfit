@@ -1,0 +1,37 @@
+## scaling factors for the forces, dipoles and stresses
+scalingF 20
+scalingD 19
+scalingS 1
+# optimization parameters
+method_Min Nelder-Mead
+ftol_Min 1e-5
+gtol_Min 5e-3
+# xtot is available for Nelder-Mead only
+xtol_Min 1e-4
+######################################
+maxiter_Min 1000
+# verbosity controlled by tag disp
+disp True
+# step size for minimization algos like BFGS or CG
+stepsize_Min 1e-4
+##############################
+# Basin hopping parameters   #
+##############################
+# number or BH iterations
+niter_BH 100
+# Parameters for the minimizer used by BH
+method_BH L-BFGS-B
+maxiter_BH 200
+ftol_BH 1e-5
+gtol_BH 1e-2
+# xtot is available for Nelder-Mead only
+xtol_BH 1e-4
+# step size for minimization algos like BFGS or CG
+stepsize_BH 1e-5
+#######################################
+temperature 0.25
+# Recommended timestep is 1.00 for BH given that steps are provided 
+# in the PARAMS file
+timestep 1.00
+# max numb of iterations at a minimum
+niter_success 10
