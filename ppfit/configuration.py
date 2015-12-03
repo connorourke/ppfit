@@ -3,15 +3,8 @@ import re
 import os
 from shutil import copyfile
 from glob import glob
+from ppfit import fitting_parameter
 
-class Fitting_Parameter:
-
-    def __init__( self, string, initial, max_delta, min_value, max_value ):
-        self.string = string
-        self.initial_value = initial
-        self.max_delta = max_delta
-        self.limits = [ min_value, max_value ]
-    
 def substitute_parameter( input, to_sub ):
     for k, v in to_sub.items():
         input = re.sub( r"{}".format( k ), str( v ), input )
