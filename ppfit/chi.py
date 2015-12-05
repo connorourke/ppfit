@@ -2,6 +2,8 @@ import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 
+fmt="{0:.7f}"
+
 def chi_squared( ai_vals, ff_vals, genplot, filename ):
     ai_s2 = ai_vals.var( axis = 1 )
     genplot = bool(genplot)
@@ -51,23 +53,46 @@ def chi_squared( ai_vals, ff_vals, genplot, filename ):
             plt.close()
     return chiSq
 
-class sumOfChi( object ):
-  def __init__( self, potential_file, configs ):
+# This is the objective function evaluated by the minimization algorithms 
+class sumOfChi:
+  def __init__( self, potential_file, training_set, scaling, plot = False ):
     self.potential_file = potential_file
-    self.configs = configs
+    self.scaling = scaling
+    self.plot = plot
+    self.training_set = training_set
+    self.ai_forces = training_set.forces.T
+    self.ai_dipoles = training_set.dipoles.T
+    self.ai_stresses = training_set.stresses.T
 
   def __call__( self, test_values ):
+    if type( test_values ) is not np.ndarray:
+        raise TypeError
     self.potential_file.write_with_parameters( test_values )
-   
-    for c in self.configs:
-        c.pimaim_run()
-    
-    reference_forces = np.concatenate( [ c.reference_forces for c in self.configs ], axis = 0 )
-    new_forces = np.concatenate( [ c.new_forces for c in self.configs ], axis = 0 )
+    ran_okay = self.training_set.run()
+    if not ran_okay:
+        totalChi = 1E10
+        outfile.write('Error: likely due to unphysical parameter value\n') 
+        outfile.close()
+        return totalChi
+    ff_forces = self.training_set.new_forces.T
+    ff_dipoles = self.training_set.new_dipoles.T
+    ff_stresses = self.training_set.new_stresses.T
 
-    chiSqF = chi_squared( reference_forces, new_forces, False, 'test' )
-    totalChi = chiSqF
+    chiSq = {}
+    chiSq[ 'forces' ]   = chi_squared( self.ai_forces, ff_forces, self.plot, 'forces-errors' )
+    chiSq[ 'dipoles' ]  = chi_squared( self.ai_dipoles, ff_dipoles, self.plot, 'dipoles-errors' )
+    chiSq[ 'stresses' ] = chi_squared( self.ai_stresses, ff_stresses, self.plot, 'stresses-errors' )
+    factorTot = sum( self.scaling.values() )
+    totalChi = sum( [ self.scaling[ k ] * chiSq[ k ] for k in chiSq.keys() ] ) / factorTot
 
-    print('totalChi:', totalChi)
+    outfile = open('OUTPUT','a')
+    outfile.write( 'Forces chi sq: ' + fmt.format(chiSq[ 'forces' ])+'\n')
+    outfile.write( 'Dipoles chi sq: ' + fmt.format(chiSq[ 'dipoles' ]) +'\n')
+    outfile.write( 'Stresses chi sq: ' + fmt.format(chiSq[ 'stresses' ]) + '\n')
+    outfile.write( 'Total chi sq (no factors): ' + fmt.format( np.mean( list( chiSq.values() ) ) ) + '\n' )
+    outfile.write('Total chi sq: '+fmt.format(totalChi)+'\n')
+    outfile.write('\n')
+    outfile.close()
 
     return totalChi
+
