@@ -32,11 +32,11 @@ class Configuration:
         self.runtime = runtime_file
         self.restart = restart_file
         self.training_data = {}
-        self.training_data[ 'forces' ] = Forces_Data( forces_file )
+        self.training_data[ 'forces' ] = Forces_Data.load( forces_file )
         if dipoles_file:
-            self.training_data[ 'dipoles' ] = Dipoles_Data( dipoles_file )
+            self.training_data[ 'dipoles' ] = Dipoles_Data.load( dipoles_file )
         if stresses_file:
-            self.training_data[ 'stresses' ] = Stresses_Data( stresses_file )
+            self.training_data[ 'stresses' ] = Stresses_Data.load( stresses_file )
         self.nsupercell = nsupercell
 
     @property

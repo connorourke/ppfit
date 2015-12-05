@@ -2,27 +2,30 @@ import numpy as np
 
 class Fitting_Data:
 
-    def __init__( self, filename, scaling = 1.0 ):
-        self.filename = filename
-        self.scaling = scaling
+    def __init__( self, data ):
+        self.data = data
+
+    def __add__( self, other ):
+        if kind( self ) is not kind( other ):
+            raise( TypeError )
+        return Fitting_Data( np.concatenate( self.data, other.data ) )
 
 class Forces_Data( Fitting_Data ):
 
-    def __init__( self, filename, scaling = 1.0 ):
-        self.filename = filename
-        self.scaling = scaling
-        self.data = np.loadtxt( filename )
+    @classmethod
+    def load( cls, filename ):
+        return Forces_Data( data = np.loadtxt( filename ) )
+        print( self.id() )
+        return self
 
 class Dipoles_Data( Fitting_Data ):
-    
-    def __init__( self, filename, scaling = 1.0 ):
-        self.filename = filename
-        self.scaling = scaling
-        self.data = np.loadtxt( filename )[:,1:4]
+   
+    @classmethod 
+    def load( cls, filename ):
+        return Dipoles_Data( data = np.loadtxt( filename )[:,1:4] )
 
 class Stresses_Data( Fitting_Data ):
 
-    def __init__( self, filename, scaling = 1.0 ):
-        self.filename = filename
-        self.scaling = scaling
-        self.data = np.loadtxt( filename ).reshape( [-1,6] )
+    @classmethod
+    def load( cls, filename ):
+        return Stresses_Data( data = np.loadtxt( filename ).reshape( [-1,6] ) )
