@@ -10,7 +10,10 @@ class Training_Set:
 
     def run( self ):
         for c in self.configurations:
-            c.pimaim_run()
+            ran_okay = c.pimaim_run()
+            if not ran_okay:
+                return( False )
+        return( True )
 
     @property
     def new_forces( self ):
