@@ -1,3 +1,5 @@
+from ppfit.fitting_parameter import Fitting_Parameter
+
 class Fitting_Parameter_Set:
 
     def __init__( self, fitting_parameters ):
@@ -22,3 +24,24 @@ class Fitting_Parameter_Set:
     @property
     def bounds( self ):
         return [ p.limits for p in self.fitting_parameters ]
+
+
+    @classmethod
+    def from_parameters_file( cls, filename = 'parameters.in' ):
+        '''
+        Parses 'parameters.in' to obtain the fitting parameters to be adjusted in the fitting procedure.
+
+        Args:
+            filename (string) (default 'parameters.in' ): Filename to read fitting parameters from in `parameters` format
+
+        Returns:
+            a Fitting_Parameter_Set instance.
+        '''
+        with open( filename, 'r') as f:
+            data = f.readlines()
+        fitting_params = []
+        for line in data:
+            if line[0] != '#':
+                string, initial_value, fixed, min_value, max_value, max_delta = line.split()
+                fitting_params.append( Fitting_Parameter( string, float( initial_value ), float( max_delta ), float( min_value ), float( max_value ) ) )
+        return Fitting_Parameter_Set( fitting_params )
