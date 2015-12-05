@@ -1,7 +1,9 @@
 import numpy as np
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.pyplot as plt
 
 def chi_squared( ai_vals, ff_vals, genplot, filename ):
-    ai_s2 = ai_vals.var( axis = 0 )
+    ai_s2 = ai_vals.var( axis = 1 )
     genplot = bool(genplot)
     sqDiff = []
     ai_plot = []
@@ -21,10 +23,10 @@ def chi_squared( ai_vals, ff_vals, genplot, filename ):
             if genplot:
                 ai_val += (j[i])**2
                 ff_val += (k[i])**2
-    sqDiff.append(numerator/denominator)
-    if genplot:
-        ai_plot.append(ai_val)
-        ff_plot.append(ff_val)
+        sqDiff.append(numerator/denominator)
+        if genplot:
+            ai_plot.append(ai_val)
+            ff_plot.append(ff_val)
     sqDiff = np.array(sqDiff)
     if genplot:
         ai_plot = np.sqrt(ai_plot)
