@@ -14,7 +14,7 @@ class Potential_File:
 
     # p is a vector of parameter values, that will replace self.potential_parameter_set.to_fit_parameters
     def write_with_parameters( self, p ):
-        parameter_values = dict( [ ( k, v ) for k, v in zip( self.potential_parameter_set.to_fit_parameters.strings, p ) ] )
+        parameter_values = dict( [ ( k, v ) for k, v in zip( self.potential_parameter_set.to_fit.strings, p ) ] )
         print( parameter_values )
         potential_to_run = substitute_parameter( self.potential_input, parameter_values )
         with open( 'potential.inpt', 'w' ) as file_out:
