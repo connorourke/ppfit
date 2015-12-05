@@ -32,9 +32,9 @@ class Configuration:
         self.restart = restart_file
         self.reference_forces = np.loadtxt( forces_file )
         if dipoles_file:
-            self.reference_dipoles = np.loadtxt( dipoles_file )
+            self.reference_dipoles = np.loadtxt( dipoles_file )[:,1:4]
         if stresses_file:
-            self.reference_stresses = np.loadtxt( stresses_file ) 
+            self.reference_stresses = np.loadtxt( stresses_file ).reshape( [-1,6] )
         self.nsupercell = nsupercell
 # TODO The forces, dipoles, stresses should probably more generally a set of Fitting_Data objects, that can be subclassed if necessary
 
