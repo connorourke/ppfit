@@ -27,11 +27,16 @@ def fitting_params_from_fitabinitioin( filename = 'fitabinitio.in' ):
 
 class Configuration:
 
-    def __init__( self, runtime_file, restart_file, forces_file, nsupercell ):
+    def __init__( self, runtime_file, restart_file, forces_file, dipoles_file = None, stresses_file = None, nsupercell = 1 ):
         self.runtime = runtime_file
         self.restart = restart_file
         self.reference_forces = np.loadtxt( forces_file )
+        if dipoles_file:
+            self.reference_dipoles = np.loadtxt( dipoles_file )
+        if stresses_file:
+            self.reference_stresses = np.loadtxt( stresses_file ) 
         self.nsupercell = nsupercell
+# TODO The forces, dipoles, stresses should probably more generally a set of Fitting_Data objects, that can be subclassed if necessary
 
     def pimaim_run( self ):
         copyfile( self.runtime, 'runtime.inpt' )
