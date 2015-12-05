@@ -4,6 +4,7 @@ import os
 from shutil import copyfile
 from glob import glob
 from ppfit.fitting_parameter import Fitting_Parameter
+from ppfit.fitting_data import Forces_Data, Dipoles_Data, Stresses_Data
 import numpy as np
 
 def fitting_params_from_fitabinitioin( filename = 'fitabinitio.in' ):
@@ -30,13 +31,25 @@ class Configuration:
     def __init__( self, runtime_file, restart_file, forces_file, dipoles_file = None, stresses_file = None, nsupercell = 1 ):
         self.runtime = runtime_file
         self.restart = restart_file
-        self.reference_forces = np.loadtxt( forces_file )
+        self.training_data = {}
+        self.training_data[ 'forces' ] = Forces_Data( forces_file )
         if dipoles_file:
-            self.reference_dipoles = np.loadtxt( dipoles_file )[:,1:4]
+            self.training_data[ 'dipoles' ] = Dipoles_Data( dipoles_file )
         if stresses_file:
-            self.reference_stresses = np.loadtxt( stresses_file ).reshape( [-1,6] )
+            self.training_data[ 'stresses' ] = Stresses_Data( stresses_file )
         self.nsupercell = nsupercell
-# TODO The forces, dipoles, stresses should probably more generally a set of Fitting_Data objects, that can be subclassed if necessary
+
+    @property
+    def reference_forces( self ):
+        return self.training_data[ 'forces' ].data
+
+    @property
+    def reference_dipoles( self ):
+        return self.training_data[ 'dipoles' ].data
+
+    @property
+    def reference_stresses( self ):
+        return self.training_data[ 'stresses' ].data
 
     def pimaim_run( self ):
         copyfile( self.runtime, 'runtime.inpt' )
