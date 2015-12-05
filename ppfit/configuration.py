@@ -58,11 +58,19 @@ class Configuration:
         for f in to_delete:
             os.remove( f )
         os.system( 'pimaim_serial > out.out' )
+        # TODO not all of these will be present, depending on the type of calculation
+        # TODO can either set this through a PIM / DIPPIM etc. flag, or check whether the files exist
         self.new_forces = np.loadtxt( 'forces.out' )[0::self.nsupercell]
-
-    def append_forces( self, dft_force_filename, md_force_filename ):
-        with open( dft_force_filename, 'a' ) as f:
-            f.write( ''.join( self.reference_forces ) )
-        with open( md_force_filename, 'a' ) as f:
-            f.write( ''.join( self.new_forces ) )
+        number_of_ions = self.new_forces.shape[0]
+        self.new_dipoles = np.loadtxt( 'dipoles.out' )[0:number_of_ions:self.nsupercell]
+        diag_stresses = np.loadtxt( 'xxyyzzstress.out' )[1:4]
+        off_diag_stresses = np.loadtxt( 'xyxzyzstress.out' )[1:4]
+        self.new_stresses = np.concatenate( ( diag_stresses, off_diag_stresses ) )
+        # TODO How should the stress tensors be treated if we have a supercell
+       
+    #def append_forces( self, dft_force_filename, md_force_filename ):
+    #    with open( dft_force_filename, 'a' ) as f:
+    #        f.write( ''.join( self.reference_forces ) )
+    #    with open( md_force_filename, 'a' ) as f:
+    #        f.write( ''.join( self.new_forces ) )
 
