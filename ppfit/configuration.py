@@ -6,6 +6,8 @@ from shutil import copyfile
 from glob import glob
 from ppfit.fitting_parameter import Fitting_Parameter
 from ppfit.fitting_data import Forces_Data, Dipoles_Data, Stresses_Data
+from ppfit.pimaim_calc import PIMAIM_Run
+
 import numpy as np
 
 def fitting_params_from_fitabinitioin( filename = 'fitabinitio.in' ):
@@ -29,15 +31,16 @@ def fitting_params_from_fitabinitioin( filename = 'fitabinitio.in' ):
 
 class Configuration:
 
-    def __init__( self, runtime_file, restart_file, forces_file, dipoles_file = None, stresses_file = None, nsupercell = 1 ):
-        self.runtime = runtime_file
+    def __init__( self, directory, runtime_file, restart_file, forces_file, dipoles_file = None, stresses_file = None, nsupercell = 1 ):
+        self.directory = directory
+        self.runtime = runtime_file 
         self.restart = restart_file
         self.training_data = {}
-        self.training_data[ 'forces' ] = Forces_Data.load( forces_file )
+        self.training_data[ 'forces' ] = Forces_Data.load( os.path.join( self.directory, forces_file ) )
         if dipoles_file:
-            self.training_data[ 'dipoles' ] = Dipoles_Data.load( dipoles_file )
+            self.training_data[ 'dipoles' ] = Dipoles_Data.load( os.path.join( self.directory, dipoles_file ) )
         if stresses_file:
-            self.training_data[ 'stresses' ] = Stresses_Data.load( stresses_file )
+            self.training_data[ 'stresses' ] = Stresses_Data.load( os.path.join( self.directory, stresses_file ) )
         self.nsupercell = nsupercell
 
     @property
@@ -52,33 +55,11 @@ class Configuration:
     def reference_stresses( self ):
         return self.training_data[ 'stresses' ].data
 
-    def pimaim_run( self ):
-        '''
-        Returns (bool): Did the calculation run as expected (i.e. dipoles converged)?
-        '''
-        copyfile( self.runtime, 'runtime.inpt' )
-        copyfile( self.restart, 'restart.dat' )
-        to_delete = glob( '*out*' ) + glob( '*.fort' )
-        for f in to_delete:
-            os.remove( f )
-        os.system( 'pimaim_serial > out.out' )
-        cg_error = 'cg failed to converge' in open( 'out.out' ).read()
-        if cg_error:
-            return False 
-        # TODO not all of these will be present, depending on the type of calculation
-        # TODO can either set this through a PIM / DIPPIM etc. flag, or check whether the files exist
-        self.new_forces = np.loadtxt( 'forces.out' )[0::self.nsupercell]
-        number_of_ions = self.new_forces.shape[0]
-        self.new_dipoles = np.loadtxt( 'dipoles.out' )[0:number_of_ions:self.nsupercell]
-        diag_stresses = np.loadtxt( 'xxyyzzstress.out' )[1:4]
-        off_diag_stresses = np.loadtxt( 'xyxzyzstress.out' )[1:4]
-        self.new_stresses = np.concatenate( ( diag_stresses, off_diag_stresses ) )
-        # TODO How should the stress tensors be treated if we have a supercell
-        return True
-       
-    #def append_forces( self, dft_force_filename, md_force_filename ):
-    #    with open( dft_force_filename, 'a' ) as f:
-    #        f.write( ''.join( self.reference_forces ) )
-    #    with open( md_force_filename, 'a' ) as f:
-    #        f.write( ''.join( self.new_forces ) )
-
+    def pimaim_run( self, clean = True ):
+        executable = PIMAIM_Run( self, clean = clean )
+        # should allow other MD codes to be used, as long as they have set_up(), run(), collect_data(), tear_down() methods (and the other input files are all okay).
+        executable.set_up()
+        executable.run()
+        executable.collect_data()
+        executable.tear_down()
+        return executable.ran_okay
