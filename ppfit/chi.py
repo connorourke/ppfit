@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
+from ppfit.io import output
 
 fmt="{0:.7f}"
 
@@ -71,8 +72,7 @@ class sumOfChi:
     ran_okay = self.training_set.run()
     if not ran_okay:
         totalChi = 1E10
-        outfile.write('Error: likely due to unphysical parameter value\n') 
-        outfile.close()
+        output('Error: likely due to unphysical parameter value\n') 
         return totalChi
     ff_forces = self.training_set.new_forces.T
     ff_dipoles = self.training_set.new_dipoles.T
@@ -85,14 +85,12 @@ class sumOfChi:
     factorTot = sum( self.scaling.values() )
     totalChi = sum( [ self.scaling[ k ] * chiSq[ k ] for k in chiSq.keys() ] ) / factorTot
 
-    outfile = open('OUTPUT','a')
-    outfile.write( 'Forces chi sq: ' + fmt.format(chiSq[ 'forces' ])+'\n')
-    outfile.write( 'Dipoles chi sq: ' + fmt.format(chiSq[ 'dipoles' ]) +'\n')
-    outfile.write( 'Stresses chi sq: ' + fmt.format(chiSq[ 'stresses' ]) + '\n')
-    outfile.write( 'Total chi sq (no factors): ' + fmt.format( np.mean( list( chiSq.values() ) ) ) + '\n' )
-    outfile.write('Total chi sq: '+fmt.format(totalChi)+'\n')
-    outfile.write('\n')
-    outfile.close()
+    output( 'Forces chi sq: ' + fmt.format(chiSq[ 'forces' ])+'\n')
+    output( 'Dipoles chi sq: ' + fmt.format(chiSq[ 'dipoles' ]) +'\n')
+    output( 'Stresses chi sq: ' + fmt.format(chiSq[ 'stresses' ]) + '\n')
+    output( 'Total chi sq (no factors): ' + fmt.format( np.mean( list( chiSq.values() ) ) ) + '\n' )
+    output('Total chi sq: '+fmt.format(totalChi)+'\n')
+    output('\n')
 
     return totalChi
 
