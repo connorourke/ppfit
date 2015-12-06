@@ -5,29 +5,29 @@ scalingS 2
 # Optimization order: 0 for minimization then BH, 1 for BH then minimization
 calc_order 1
 # optimization parameters supported CG, Nelder-Mead or L-BFGS-B (bounded)
-method_Min L-BFGS-B 
-ftol_Min 1e-4
-gtol_Min 1e-2
+method_min Nelder-Mead
+ftol_min 1e-4
+gtol_min 1e-2
 # xtot is available for Nelder-Mead only
-xtol_Min 1e-2
+xtol_min 1e-2
 ######################################
-maxiter_Min 500
+maxiter_min 500
 # verbosity controlled by tag disp
 disp True
 # step size for minimization algos like BFGS or CG
-stepsize_Min 1e-4
+stepsize_min 1e-4
 ##############################
 # Basin hopping parameters   #
 ##############################
 # number or BH iterations
 niter_BH 100
 # Parameters for the minimizer used by BH
-method_BH CG 
+method_BH Nelder-Mead
 maxiter_BH 200
-ftol_BH 1e-4
-gtol_BH 1e-2
+ftol_BH 1e-2
+gtol_BH 1e-1
 # xtot is available for Nelder-Mead only
-xtol_BH 1e-3
+xtol_BH 1e-2
 # step size for minimization algos like BFGS or CG
 stepsize_BH 1e-4
 #######################################
