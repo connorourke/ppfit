@@ -6,7 +6,7 @@ from scipy.optimize import basinhopping, minimize
 
 def output( msg ):
     outfile = open('OUTPUT','a')
-    outfile.write(results_min.message)
+    outfile.write( msg )
     outfile.close()
 
 class LBFGSB_Minimizer:
