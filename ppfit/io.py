@@ -32,3 +32,8 @@ def mkdir_p(path):
             pass
         else: 
             raise
+
+def output( msg ):
+    outfile = open('OUTPUT','a')
+    outfile.write( msg )
+    outfile.close()
