@@ -1,3 +1,5 @@
+import os, errno
+
 def read_from_file(name,cols,split):
     '''
     This routine reads the input files, e.g. TEMPLATES, OPT, AI_*,etc
@@ -21,3 +23,12 @@ def read_from_file(name,cols,split):
                 if cols == 6:
                     configs.append(line.split())
     return configs
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: 
+            raise
