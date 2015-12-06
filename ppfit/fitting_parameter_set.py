@@ -1,4 +1,5 @@
 from ppfit.fitting_parameter import Fitting_Parameter
+import numpy as np
 
 class Fitting_Parameter_Set:
 
@@ -29,7 +30,7 @@ class Fitting_Parameter_Set:
   
     @property
     def initial_values( self ):
-        return [ p.initial_value for p in self.fitting_parameters ]
+        return np.array( [ p.initial_value for p in self.fitting_parameters ] )
 
     @property
     def bounds( self ):
