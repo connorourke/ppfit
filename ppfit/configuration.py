@@ -55,9 +55,11 @@ class Configuration:
     def reference_stresses( self ):
         return self.training_data[ 'stresses' ].data
 
-    def pimaim_run( self, clean = True ):
-        executable = PIMAIM_Run( self, clean = clean )
-        # should allow other MD codes to be used, as long as they have set_up(), run(), collect_data(), tear_down() methods (and the other input files are all okay).
+    def run( self, code = 'pimaim', clean = True ):
+        if code == 'pimaim':
+            executable = PIMAIM_Run( self, clean = clean )
+        else:
+            sys.exit( '{} not a recognised IP code'.format( code ) )
         executable.set_up()
         executable.run()
         executable.collect_data()

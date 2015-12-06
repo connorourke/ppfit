@@ -8,9 +8,9 @@ class Training_Set:
         self.dipoles  = np.concatenate( [ c.reference_dipoles  for c in configurations ] )
         self.stresses = np.concatenate( [ c.reference_stresses for c in configurations ] )
 
-    def run( self ):
+    def run( self, code ):
         for c in self.configurations:
-            ran_okay = c.pimaim_run()
+            ran_okay = c.run( code = code, clean = True )
             if not ran_okay:
                 return( False )
         return( True )
