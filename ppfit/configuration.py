@@ -1,52 +1,67 @@
 import sys
+import subprocess
 import re
 import os
 from shutil import copyfile
 from glob import glob
+from ppfit.fitting_parameter import Fitting_Parameter
+from ppfit.fitting_data import Forces_Data, Dipoles_Data, Stresses_Data
+from ppfit.pimaim_calc import PIMAIM_Run
 
-def substitute_parameter( input, to_sub ):
-    for k, v in to_sub.items():
-        input = re.sub( r"{}".format( k ), str( v ), input )
-    return input
+import numpy as np
 
-def fitting_params_from_fitabinitioin():
-    filename = 'fitabinitio.in'
+def fitting_params_from_fitabinitioin( filename = 'fitabinitio.in' ):
+    '''
+    Parses 'fitabinitio.in' to obtain the fitting parameters to be adjusted in the fitting procedure.
+
+    Args:
+        filename (string) (default 'fitabinitio.in' ): Filename to read fitting parameters from in `fitabinitio` format
+
+    Returns:
+        a list of ppfit.Fitting_Parameter objects.
+    '''
     with open( filename, 'r') as f:
         data = f.read()
-        return [ line.split()[1] for line in re.findall( r"MINUIT : fit to ab initio data\n([\s+\w+\n\.-]*)\nPRINTOUT", data )[0].split("\n") if line ]
-
-def initialise_potential_file( potential_file ):
-    with open( potential_file, 'r' ) as file_in:
-        potential_input = file_in.read()
-    to_sub = {}
-    potential_fitting_parameters = fitting_params_from_fitabinitioin()
-    for i, string in enumerate( potential_fitting_parameters ):
-        to_sub[ string ] = sys.argv[ i+1 ]
-    potential_to_run = substitute_parameter( potential_input, to_sub )
-    with open( 'potential.inpt', 'w' ) as file_out:
-        file_out.write( potential_to_run )
+    fitting_params = []
+    for line in re.findall( r"MINUIT : fit to ab initio data\n([\s+\w+\n\.-]*)\nPRINTOUT", data )[0].split("\n"):
+        if line:
+            string, initial_value, max_delta, min_value, max_value = line.split()[1:6]
+            fitting_params.append( Fitting_Parameter( string, float( initial_value ), float( max_delta ), float( min_value ), float( max_value ) ) )
+    return fitting_params  
 
 class Configuration:
 
-    def __init__( self, runtime_file, restart_file, forces_file, nsupercell ):
-        self.runtime = runtime_file
+    def __init__( self, directory, runtime_file, restart_file, forces_file, dipoles_file = None, stresses_file = None, nsupercell = 1 ):
+        self.directory = directory
+        self.runtime = runtime_file 
         self.restart = restart_file
-        with open( forces_file, 'r' ) as f:
-            self.reference_forces = f.read()
+        self.training_data = {}
+        self.training_data[ 'forces' ] = Forces_Data.load( os.path.join( self.directory, forces_file ) )
+        if dipoles_file:
+            self.training_data[ 'dipoles' ] = Dipoles_Data.load( os.path.join( self.directory, dipoles_file ) )
+        if stresses_file:
+            self.training_data[ 'stresses' ] = Stresses_Data.load( os.path.join( self.directory, stresses_file ) )
         self.nsupercell = nsupercell
 
-    def pimaim_run( self ):
-        copyfile( self.runtime, 'runtime.inpt' )
-        copyfile( self.restart, 'restart.dat' )
-        to_delete = glob( '*out*' ) + glob( '*.fort' )
-        for f in to_delete:
-            os.remove( f )
-        os.system( 'pimaim_serial > out.out' )
-        with open( 'forces.out', 'r' ) as f:
-            self.new_forces = f.readlines()[0::self.nsupercell]
+    @property
+    def reference_forces( self ):
+        return self.training_data[ 'forces' ].data
 
-    def append_forces( self, dft_force_filename, md_force_filename ):
-        with open( dft_force_filename, 'a' ) as f:
-            f.write( ''.join( self.reference_forces ) )
-        with open( md_force_filename, 'a' ) as f:
-            f.write( ''.join( self.new_forces ) )
+    @property
+    def reference_dipoles( self ):
+        return self.training_data[ 'dipoles' ].data
+
+    @property
+    def reference_stresses( self ):
+        return self.training_data[ 'stresses' ].data
+
+    def run( self, code = 'pimaim', clean = True ):
+        if code == 'pimaim':
+            executable = PIMAIM_Run( self, clean = clean )
+        else:
+            sys.exit( '{} not a recognised IP code'.format( code ) )
+        executable.set_up()
+        executable.run()
+        executable.collect_data()
+        executable.tear_down()
+        return executable.ran_okay
