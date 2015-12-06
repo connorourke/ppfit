@@ -64,7 +64,7 @@ class sumOfChi:
     self.ai_dipoles = training_set.dipoles.T
     self.ai_stresses = training_set.stresses.T
 
-  def __call__( self, test_values ):
+  def evaluate( self, test_values ):
     if type( test_values ) is not np.ndarray:
         raise TypeError
     self.potential_file.write_with_parameters( test_values )
