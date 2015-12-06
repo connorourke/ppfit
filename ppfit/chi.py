@@ -5,6 +5,24 @@ from ppfit.io import output
 
 fmt="{0:.7f}"
 
+def plot( data, filename, title ):
+    with PdfPages( '{}.pdf'.format( filename ) ) as pdf:
+        f, axarr = plt.subplots(2, sharex=True)
+        att1 = {'color': 'black', 'markerfacecolor': None, 'markersize': 2.5,
+        'markeredgewidth': 0.5, 'alpha': 1.0, 'marker': 'o',
+        'markeredgecolor': 'black','linestyle' : ':'}
+        att2 = {'color': 'blue', 'markerfacecolor': None, 'markersize': 2.5,
+        'markeredgewidth': 0.5, 'alpha': 1.0, 'marker': 'o',
+        'markeredgecolor': 'blue','linestyle' : 'None'}
+        axarr[0].plot(ai_plot,**att1)
+        axarr[0].plot(ff_plot,**att2)
+        axarr[0].set_title( title )
+        axarr[1].plot( sqDiff, 'r' )
+        plt.ylabel('ERRORS')
+        plt.xlabel('index')
+        pdf.savefig()  # saves the current figure into a pdf page
+        plt.close()
+
 def chi_squared( ai_vals, ff_vals, genplot, filename ):
     ai_s2 = ai_vals.var( axis = 1 )
     genplot = bool(genplot)
@@ -31,27 +49,11 @@ def chi_squared( ai_vals, ff_vals, genplot, filename ):
             ai_plot.append(ai_val)
             ff_plot.append(ff_val)
     sqDiff = np.array(sqDiff)
+    chiSq = np.sum(sqDiff)/len(sqDiff)
     if genplot:
         ai_plot = np.sqrt(ai_plot)
         ff_plot = np.sqrt(ff_plot)
-    chiSq = np.sum(sqDiff)/len(sqDiff)
-    if genplot:
-        with PdfPages(filename+'.pdf') as pdf:
-            f, axarr = plt.subplots(2, sharex=True)
-            att1 = {'color': 'black', 'markerfacecolor': None, 'markersize': 2.5,
-            'markeredgewidth': 0.5, 'alpha': 1.0, 'marker': 'o',
-            'markeredgecolor': 'black','linestyle' : ':'}
-            att2 = {'color': 'blue', 'markerfacecolor': None, 'markersize': 2.5,
-            'markeredgewidth': 0.5, 'alpha': 1.0, 'marker': 'o',
-            'markeredgecolor': 'blue','linestyle' : 'None'}
-            axarr[0].plot(ai_plot,**att1)
-            axarr[0].plot(ff_plot,**att2)
-            axarr[0].set_title('Difference = '+str(chiSq))
-            axarr[1].plot(sqDiff,'r')
-            plt.ylabel('ERRORS')
-            plt.xlabel('index')
-            pdf.savefig()  # saves the current figure into a pdf page
-            plt.close()
+        plot( [ ai_plot, ff_plot ], filename, title = 'Difference = {}'.format( str( chiSq ) ) )
     return chiSq
 
 # This is the objective function evaluated by the minimization algorithms 
