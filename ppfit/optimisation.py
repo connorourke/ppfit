@@ -1,13 +1,8 @@
 import sys
 import numpy as np
-from ppfit.io import read_from_file
+from ppfit.io import read_from_file, output
 from ppfit.basin_hopping import MyTakeStep, WriteRestart, MyBounds
 from scipy.optimize import basinhopping, minimize
-
-def output( msg ):
-    outfile = open('OUTPUT','a')
-    outfile.write( msg )
-    outfile.close()
 
 class LBFGSB_Minimizer:
 
