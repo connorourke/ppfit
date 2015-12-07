@@ -13,21 +13,24 @@ from ppfit.optimisation import read_optimisation_options, optimise
 
 outfile = open('OUTPUT','w')
 
-config1 = Configuration( directory = 'configs/cubic/',
+config1 = Configuration( species = { 'Ba', 'Ti', 'O' },
+                         directory = 'configs/cubic/',
                          runtime_file = 'runtime_cubic.inpt',
                          restart_file = 'restart_cubic.dat',
                          forces_file  = 'cubic.force',
                          dipoles_file = 'cubic.dip', 
                          stresses_file = 'cubic.stress' )
 
-config2 = Configuration( directory = 'configs/tet',
+config2 = Configuration( species = { 'Ba', 'Ti', 'O' },
+                         directory = 'configs/tet',
                          runtime_file = 'runtime_tet.inpt',
                          restart_file = 'restart_tet.dat',
                          forces_file  = 'tet.force',
                          dipoles_file = 'tet.dip', 
                          stresses_file = 'tet.stress' )
 
-config3 = Configuration( directory = 'configs/rhombo',
+config3 = Configuration( species = { 'Ba', 'Ti', 'O' },
+                         directory = 'configs/rhombo',
                          runtime_file = 'runtime_rhombo.inpt',
                          restart_file = 'restart_rhombo.dat',
                          forces_file  = 'rhombo.force',

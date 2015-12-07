@@ -31,7 +31,8 @@ def fitting_params_from_fitabinitioin( filename = 'fitabinitio.in' ):
 
 class Configuration:
 
-    def __init__( self, directory, runtime_file, restart_file, forces_file, dipoles_file = None, stresses_file = None, nsupercell = 1 ):
+    def __init__( self, species, directory, runtime_file, restart_file, forces_file, dipoles_file = None, stresses_file = None, nsupercell = 1 ):
+        self.species = species
         self.directory = directory
         self.runtime = runtime_file 
         self.restart = restart_file

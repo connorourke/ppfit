@@ -2,6 +2,16 @@ import numpy as np
 import os
 from shutil import copyfile
 from glob import glob
+import re
+
+def include_in_potential_file( line, species ):
+    if not re.search( '#', line ):
+        return True
+    else:
+        species_decoration = re.compile( '#(.*)' ).findall( line )[0].split()
+        if set( species_decoration ).issubset( species ):
+            return True
+    return False
 
 class PIMAIM_Run:
 
@@ -14,7 +24,11 @@ class PIMAIM_Run:
         self.ran_okay = None
 
     def set_up( self ):
-        copyfile( 'potential.inpt', os.path.join( self.configuration.directory, 'potential.inpt' ) )
+        with open( 'potential.inpt' ) as f:
+            lines = f.readlines()
+        new_potential_file = os.path.join( self.configuration.directory, 'potential.inpt' ) 
+        with open( new_potential_file, 'w' ) as f:
+            [ f.write( l )for l in lines if include_in_potential_file( l, self.configuration.species ) ] 
         for f in os.listdir( self.common_input_dir ):
             copyfile( os.path.join( self.common_input_dir, f ), os.path.join( self.configuration.directory, f ) )
         os.chdir( self.configuration.directory )
