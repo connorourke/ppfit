@@ -1,93 +1,93 @@
 XFT                   (potential type).
-AOO                   Alpha+- (a.u.) 
-BOO                   Beta (pre-exp) 
-3.0000                Gaussian terms
-0.0000        
-0
-C6OO                  FT C_6 O-O
-C8OO                  FT C_8 O-O
-Cf6OO                 FT f_6 O-O
-Cf6OO                 FT f_8 O-O
+AOO                   Alpha+- (a.u.)  # O O
+BOO                   Beta (pre-exp)  # O O
+3.0000                Gaussian terms  # O O
+0.0000                                # O O  
+0                                     # O O
+C6OO                  FT C_6 O-O      # O O
+C8OO                  FT C_8 O-O      # O O
+Cf6OO                 FT f_6 O-O      # O O
+Cf6OO                 FT f_8 O-O      # O O
 
-AOBa                  Alpha+- (a.u.) exp
-BOBa                  Beta (pre-exp) 
-3.0000                Gaussian terms
-0.0000        
-0
-C6OBa              FT C_6 O-Ba
-C8OBa              FT C_8 O-Ba
-Cf6OBa             FT f_6 O-Ba
-Cf6OBa             FT f_8 O-Ba
+AOBa                  Alpha+- (a.u.) exp # Ba O
+BOBa                  Beta (pre-exp)     # Ba O
+3.0000                Gaussian terms     # Ba O
+0.0000                                   # Ba O
+0                                        # Ba O
+C6OBa              FT C_6 O-Ba           # Ba O
+C8OBa              FT C_8 O-Ba           # Ba O
+Cf6OBa             FT f_6 O-Ba           # Ba O
+Cf6OBa             FT f_8 O-Ba           # Ba O
 
-AOTi                  Alpha+- (a.u.) exp 
-BOTi                  Beta (pre-exp) 
-3.0000                Gaussian terms
-0.0000        
-0
-C6OTi               FT C_6 O-Ti
-C8OTi               FT C_8 O-Ti
-Cf6OTi              FT f_6 O-Ti
-Cf6OTi              FT f_8 O-Ti
+AOTi                  Alpha+- (a.u.) exp # Ti O
+BOTi                  Beta (pre-exp) # Ti O
+3.0000                Gaussian terms # Ti O
+0.0000                          # Ti O
+0                               # Ti O
+C6OTi               FT C_6 O-Ti # Ti O
+C8OTi               FT C_8 O-Ti # Ti O
+Cf6OTi              FT f_6 O-Ti # Ti O
+Cf6OTi              FT f_8 O-Ti # Ti O
 
-5.000                   a44
-0.0000                  A44
-3.0000                Gaussian terms
-0.0000        
-0
-0.000d0               FT C_6 44
-0.000d0               FT C_8 44
-1.9d0                 FT f_6 44
-1.9d0                 FT f_8 44
+5.000                   a44     # Ba Ba
+0.0000                  A44     # Ba Ba
+3.0000                Gaussian terms     # Ba Ba
+0.0000             # Ba Ba
+0     # Ba Ba
+0.000d0               FT C_6 44     # Ba Ba
+0.000d0               FT C_8 44     # Ba Ba
+1.9d0                 FT f_6 44     # Ba Ba
+1.9d0                 FT f_8 44     # Ba Ba
 
-5.000                   a22
-0.0000                  A22
-3.0000                Gaussian terms
-0.0000        
-0
-0.001d0               FT C_6 22
-0.001d0               FT C_8 22
-1.9d0                 FT f_6 22
-1.9d0                 FT f_8 22
+5.000                   a22         # Ba Ti
+0.0000                  A22         # Ba Ti
+3.0000                Gaussian terms         # Ba Ti
+0.0000                 # Ba Ti
+0         # Ba Ti
+0.001d0               FT C_6 22         # Ba Ti
+0.001d0               FT C_8 22         # Ba Ti
+1.9d0                 FT f_6 22         # Ba Ti
+1.9d0                 FT f_8 22         # Ba Ti
 
-5.000                   a24
-0.0000                  A24
-3.0000                Gaussian terms
-0.0000        
-0
-0.001d0               FT C_6 24
-0.001d0               FT C_8 24
-1.9d0                 FT f_6 24
-1.9d0                 FT f_8 24
+5.000                   a24     # Ti Ti
+0.0000                  A24     # Ti Ti
+3.0000                Gaussian terms     # Ti Ti
+0.0000             # Ti Ti
+0     # Ti Ti
+0.001d0               FT C_6 24     # Ti Ti
+0.001d0               FT C_8 24     # Ti Ti
+1.9d0                 FT f_6 24     # Ti Ti
+1.9d0                 FT f_8 24     # Ti Ti
 
-ALPHAO           dipole polarisability 1
-BDIPOO               dipole 1-2 damping b    O-O (like-like)
-4                    dipole 1-2 order        O-O
-CDIPOO               dipole 1-2 damping c    O-O
-BDIPOBa              dipole 1-2 damping b    O-Ba
-4                    dipole 1-2 order        O-Ba
-CDIPOBa              dipole 1-2 damping c    O-Ba
-BDIPOTi              dipole 1-2 damping b    O-Ti
-4                    dipole 1-2 order        O-Ti
-CDIPOTi              dipole 1-2 damping c    O-Ti
+ALPHAO           dipole polarisability 1    # O
+BDIPOO               dipole 1-2 damping b    O-O (like-like) # O O
+4                    dipole 1-2 order        O-O # O O
+CDIPOO               dipole 1-2 damping c    O-O # O O
+BDIPOBa              dipole 1-2 damping b    O-Ba # O
+4                    dipole 1-2 order        O-Ba # O
+CDIPOBa              dipole 1-2 damping c    O-Ba # O
+BDIPOTi              dipole 1-2 damping b    O-Ti # O Ti
+4                    dipole 1-2 order        O-Ti # O Ti
+CDIPOTi              dipole 1-2 damping c    O-Ti # O Ti
                                                                  
-ALPHABa          dipole polarisability 1
-BDIPOBa               dipole 1-2 damping b       Ba-O
-4                    dipole 1-2 order           Ba-O
-CDIPBaO              dipole 1-2 damping c       Ba-O
-3.5000               dipole 1-2 damping b       Ba-Ba
-4                    dipole 1-2 order           Ba-Ba
-0.0000
-3.5000               dipole 1-2 damping b       Ba-Ti
-4                    dipole 1-2 order           Ba-Ti
-0.0000                 dipole 1-2 damping c       Ba-Ti
+ALPHABa          dipole polarisability 1 # Ba
+BDIPOBa               dipole 1-2 damping b       Ba-O # Ba O
+4                    dipole 1-2 order           Ba-O # Ba O
+CDIPBaO              dipole 1-2 damping c       Ba-O # Ba O
+3.5000               dipole 1-2 damping b       Ba-Ba # Ba Ba
+4                    dipole 1-2 order           Ba-Ba # Ba Ba
+0.0000 # Ba Ba
+3.5000               dipole 1-2 damping b       Ba-Ti # Ba Ti
+4                    dipole 1-2 order           Ba-Ti # Ba Ti
+0.0000                 dipole 1-2 damping c       Ba-Ti # Ba Ti
 
-ALPHATi          dipole polarisability 1
-BDIPOTi              dipole 1-2 damping b       Ti-O
-4                    dipole 1-2 order
-CDIPTiO              dipole 1-2 damping c
-3.5000               dipole 1-2 damping b       Ti-Ba
-4                    dipole 1-2 order           Ti-Ba
-0.0000                dipole 1-2 damping c       Ti-Ba
-3.5000                dipole 1-2 damping b       Ti-Ti
-4                    dipole 1-2 order           Ti-Ti
-0.0000                 dipole 1-2 damping c       Ti-Ti
+ALPHATi          dipole polarisability 1 # Ti
+BDIPOTi              dipole 1-2 damping b       Ti-O #Ti O
+4                    dipole 1-2 order #Ti O
+CDIPTiO              dipole 1-2 damping c #Ti O
+3.5000               dipole 1-2 damping b       Ti-Ba #Ti Ba
+4                    dipole 1-2 order           Ti-Ba #Ti Ba
+0.0000                dipole 1-2 damping c       Ti-Ba #Ti Ba
+3.5000                dipole 1-2 damping b       Ti-Ti # Ti Ti
+4                    dipole 1-2 order           Ti-Ti # Ti Ti
+0.0000                 dipole 1-2 damping c       Ti-Ti # Ti Ti
