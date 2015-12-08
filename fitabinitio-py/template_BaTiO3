@@ -1,13 +1,13 @@
-XFT                 (potential type).
-AOO                 Alpha+- (a.u.)    # O O
-BOO                 Beta (pre-exp)    # O O
-3.0000              Gaussian terms    # O O
+XFT                (potential type).
+AOO                Alpha+- (a.u.)     # O O
+BOO                Beta (pre-exp)     # O O
+3.0000             Gaussian terms     # O O
 0.0000                                # O O  
 0                                     # O O
-C6OO                FT C_6            # O O
-C8OO                FT C_8            # O O
-Cf6OO               FT f_6            # O O
-Cf6OO               FT f_8            # O O
+C6OO               FT C_6             # O O
+C8OO               FT C_8             # O O
+Cf6OO              FT f_6             # O O
+Cf6OO              FT f_8             # O O
 
 AOBa               Alpha+- (a.u.) exp # Ba O
 BOBa               Beta (pre-exp)     # Ba O
