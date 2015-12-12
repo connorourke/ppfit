@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib
+matplotlib.use( 'Agg' )
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 from ppfit.io import output
