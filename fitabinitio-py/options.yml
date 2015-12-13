@@ -1,3 +1,7 @@
+calculation:
+    code: pimaim
+    exec: mpirun -np 16 pimaim_mpi
+
 # scaling factors for the forces, dipoles and stresses
 scaling:
     forces: 20
@@ -14,7 +18,7 @@ verbose: True
 #    L-BFGS-B (bounded)
 #    Particle-Swarm
 
-minimisation_method: Nelder-Mead
+method: Nelder-Mead
 
 tolerance:
     ftol: 1e-4

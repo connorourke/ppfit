@@ -73,7 +73,7 @@ class sumOfChi:
     if type( test_values ) is not np.ndarray:
         raise TypeError
     self.potential_file.write_with_parameters( test_values )
-    ran_okay = self.training_set.run( 'pimaim' )
+    ran_okay = self.training_set.run()
     if not ran_okay:
         totalChi = 1E10
         output('Error: likely due to unphysical parameter value\n') 

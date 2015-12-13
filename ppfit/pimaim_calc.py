@@ -15,10 +15,10 @@ def include_in_potential_file( line, species ):
 
 class PIMAIM_Run:
 
-    def __init__( self, configuration, clean = True, executable = 'pimaim_serial' ):
+    def __init__( self, configuration, cmd, clean = True ):
         self.configuration = configuration
+        self.cmd = cmd
         self.clean = clean
-        self.executable = executable
         self.common_input_dir = 'common_input'
         self.cwd = os.getcwd()
         self.ran_okay = None
@@ -38,7 +38,7 @@ class PIMAIM_Run:
         return self 
 
     def run( self ):
-        os.system( '{} > out.out'.format( self.executable ) )
+        os.system( '{} > out.out'.format( self.cmd ) )
         cg_error = 'cg failed to converge' in open( 'out.out' ).read()
         if cg_error:
             self.ran_okay = False
