@@ -58,7 +58,6 @@ def optimise( function, fitting_parameters, opts ):
     pot_values_min = fitting_parameters.to_fit.min_bounds
     pot_values_max = fitting_parameters.to_fit.max_bounds
     pot_values = np.asarray( fitting_parameters.to_fit.initial_values )
-    minim_bounds = fitting_parameters.to_fit.bounds
 
     # Choose the calculation order
     if ( 'use_basin_hopping' not in opts.keys() or
@@ -67,7 +66,7 @@ def optimise( function, fitting_parameters, opts ):
     # what happens if we are not using basin hopping?
         if opts[ 'method' ] == 'L-BFGS-B':
             minimizer = LBFGSB_Minimizer( opts )
-            results_min = minimizer.minimize( function, pot_values, bounds )
+            results_min = minimizer.minimize( function, pot_values, bounds = fitting_parameters.to_fit.bounds )
         elif opts[ 'method' ] == 'CG':
             minimizer = CG_Minimizer( opts )
             results_min = minimizer.minimize( function, pot_values )
@@ -126,10 +125,8 @@ def optimise( function, fitting_parameters, opts ):
     # Bounds for BH
         mybounds = MyBounds(pot_values_max,pot_values_min)
         if opts[ 'basin_hopping' ][ 'method' ] in ('L-BFGS-B'):
-            # Bounds for minimization method inside BH
-            bounds = minim_bounds
             minimizer_kwargs = { 'method': opts[ 'basin_hopping' ][ 'method' ],
-                                 'bounds': bounds,
+                                 'bounds': fitting_parameters.to_fit.bounds,
                                  'options': options}
         else:
             minimizer_kwargs = { 'method': opts[ 'basin_hopping' ][ 'method' ],
