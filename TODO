@@ -1,0 +1,10 @@
+# TODO
+- Check that all current minimisation options work
+- Document the available minimisation options, and the settings they need in OPTS(?) to run
+
+- Reimplement program options / optimisation settings (possibly do this using a YAML configuration file?)
+
+    e.g. http://stackoverflow.com/questions/5055042/whats-the-best-practice-using-a-settings-file-in-python 
+
+    import yaml
+    config = yaml.safe_load( open( "path/to/config.yml" ) )
