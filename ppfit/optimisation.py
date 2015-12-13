@@ -7,11 +7,11 @@ from scipy.optimize import basinhopping, minimize
 class LBFGSB_Minimizer:
 
     def __init__( self, opts ):
-        self.options = { 'ftol': opts.ftol_min,
-                         'gtol': opts.gtol_min,
-                         'disp': opts.verbose,
-                         'maxiter': opts.maxiter_min,
-                         'eps': opts.stepsize_min }
+        self.options = { 'ftol': opts[ 'tolerance' ][ 'ftol' ],
+                         'gtol': opts[ 'tolerance' ][ 'gtol' ],
+                         'disp': opts[ 'verbose' ],
+                         'maxiter': opts[ 'maxiter' ],
+                         'eps': opts[ 'stepsize' ] }
 
     def minimize( self, function, initial_values, bounds ): # can initial values and bounds be passed in as a Fitting_Parameter_Set object?
         print( 'L-BFGS-B minimisation' )
@@ -21,10 +21,10 @@ class LBFGSB_Minimizer:
 class Nelder_Mead_Minimizer:
 
     def __init__( self, opts ):
-        self.options= { 'ftol': opts.ftol_min,
-                        'xtol': opts.xtol_min,
-                        'disp': opts.verbose,
-                        'maxiter': opts.maxiter_min }
+        self.options= { 'ftol': opts[ 'tolerance' ][ 'ftol' ],
+                        'xtol': opts[ 'tolerance' ][ 'xtol' ],
+                        'disp': opts[ 'verbose' ],
+                        'maxiter': opts[ 'maxiter' ] }
 
     def minimize( self, function, initial_values ):
         print( 'Nelder-Mead minimisation' )
@@ -34,11 +34,11 @@ class Nelder_Mead_Minimizer:
 class CG_Minimizer:
 
     def __init__( self, opts ):
-        self.options = { 'gtol': opts.gtol_min,
-                         'disp': opts.verbose,
-                         'maxiter': opts.maxiter_min,
-                         'eps': opts.stepsize_min }
-        self.tol = opts.ftol_min
+        self.options = { 'gtol': opts[ 'tolerance'][ 'gtol' ],
+                         'disp': opts[ 'verbose' ],
+                         'maxiter': opts[ 'maxiter' ],
+                         'eps': opts[ 'stepsize' ] }
+        self.tol = opts[ 'tolerance' ][ 'ftol' ]
 
     def minimize( self, function, initial_values ): # bounds?
         print( 'CG minimisation' )
@@ -46,7 +46,6 @@ class CG_Minimizer:
         return results_min
  
 def optimise( function, fitting_parameters, opts ):
-    method = opts[ 'method' ]
     tot_vars = ( fitting_parameters.to_fit + fitting_parameters.fixed ).strings
     pot_vars = fitting_parameters.to_fit.strings
     const_vars = fitting_parameters.fixed.strings
@@ -109,7 +108,6 @@ def optimise( function, fitting_parameters, opts ):
         else:
             exit( 'not recognised as basin hopping calculation order: {}'.format( opts[ 'basin_hopping' ][ 'calc_order' ] ) )
             # Step sizes for BH
-        mysteps = MyTakeStep(step_sizes) 
         output( 'The temperature is set to: '+str(temperature)+'\n' )
     # Set the options for the minimization algo in BH
         if opts[ 'basin_hopping' ][ 'method' ] in ('L-BFGS-B','CG'):
@@ -142,7 +140,7 @@ def optimise( function, fitting_parameters, opts ):
                                    T = temperature, 
                                    stepsize = opts[ 'basin_hopping'][ 'timestep' ],
                                    minimizer_kwargs = minimizer_kwargs,
-                                   take_step = mysteps,
+                                   take_step = MyTakeStep( step_sizes ),
                                    disp = opts[ 'verbose' ],
                                    accept_test = mybounds,
                                    callback = write_restart, 
