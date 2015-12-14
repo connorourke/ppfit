@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use( 'Agg' )
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
-from ppfit.io import output
+from ppfit.inputoutput import output
 
 fmt="{0:.7f}"
 

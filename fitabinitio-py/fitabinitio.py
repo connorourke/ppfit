@@ -8,7 +8,7 @@ from ppfit.configuration import Configuration
 from ppfit.fitting_parameter_set import Fitting_Parameter_Set
 from ppfit.potential_file import Potential_File
 from ppfit.training_set import Training_Set
-from ppfit.io import read_from_file, mkdir_p
+from ppfit.inputoutput import mkdir_p
 from ppfit.optimisation import optimise
 from ppfit.options import read_options
 

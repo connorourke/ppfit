@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-from ppfit.io import read_from_file, output
+from ppfit.inputoutput import output, mkdir_p
 from ppfit.basin_hopping import MyTakeStep, WriteRestart, MyBounds
 from ppfit.chi import sumOfChi
 from scipy.optimize import basinhopping, minimize
