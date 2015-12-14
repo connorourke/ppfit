@@ -2,6 +2,7 @@ import sys
 import numpy as np
 from ppfit.io import read_from_file, output
 from ppfit.basin_hopping import MyTakeStep, WriteRestart, MyBounds
+from ppfit.chi import sumOfChi
 from scipy.optimize import basinhopping, minimize
 
 class LBFGSB_Minimizer:
@@ -82,8 +83,7 @@ def optimise( function, fitting_parameters, opts ):
         write_Results_min = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESULTS_min')
         write_Results_min(results_min.x,results_min.fun,accepted=1)
 
-        secondSumOfChi = sumOfChi( potential_file, training_set, chi_squared_scaling, plot = True )
-        secondSumOfChi.evaluate(results_min.x)
+        function.evaluate( results_min.x, plot = True )
         mkdir_p('./min-errors-pdfs')
         os.system('mv *.pdf ./min-errors-pdfs')
 
@@ -149,8 +149,7 @@ def optimise( function, fitting_parameters, opts ):
         write_Results_BH = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESULTS_BH')
         write_Results_BH( results_BH.x, results_BH.fun, accepted = 1 )
     
-        finalSumOfChi = sumOfChi( potential_file, training_set, chi_squared_scaling, plot = True ) # TODO would be nice if plot took a file path as an argument (default None) and saved a pdf to that file (creating the directory if necessary)
-        # TODO in fact, plot should be an argument of evaluate(), not of __init__()
-        finalSumOfChi.evaluate( results_BH.x )
+        # plot should take target filenames as arguments to save having to move afterwards
+        function.evaluate( results_BH.x, plot = True )
         mkdir_p('./BH-errors-pdfs')
         os.system('mv *.pdf ./BH-errors-pdfs')

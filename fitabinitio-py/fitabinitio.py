@@ -51,13 +51,12 @@ chi_squared_scaling = { 'forces':   options[ 'scaling' ][ 'forces' ],
                         'dipoles':  options[ 'scaling' ][ 'dipoles' ],
                         'stresses': options[ 'scaling' ][ 'stresses' ] }
 
-sum_of_chi = sumOfChi( potential_file, training_set, chi_squared_scaling, plot = True )
+sum_of_chi = sumOfChi( potential_file, training_set, chi_squared_scaling )
 
 # # evaluate sum_of_chi with our initial potential parameters, and save a .pdf plot
-# sum_of_chi.evaluate( fitting_parameters.to_fit.initial_values )
+# sum_of_chi.evaluate( fitting_parameters.to_fit.initial_values, plot = True )
 # # TODO move plotting capabilities of sum_of_chi to a .plot method, and allow the target directory to be set here
 # mkdir_p('./initial-errors-pdfs')
 # os.system('mv *.pdf ./initial-errors-pdfs')
 
-sum_of_chi.plot = False
 optimise( sum_of_chi.evaluate, fitting_parameters, options )
