@@ -1,0 +1,4 @@
+# TODO
+- Check that all current minimisation options work
+- Document the available minimisation options, and the settings they need in OPTS(?) to run
+- Write Training_Set.from_configs_file( [optional filename] ) routine, to parse a `configs.yml` input file and generate the training set configurations 

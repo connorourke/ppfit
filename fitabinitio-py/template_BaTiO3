@@ -70,7 +70,7 @@ BDIPOTi            dipole damping b        # O Ti
 4                  dipole order            # O Ti
 CDIPOTi            dipole damping c        # O Ti
                                                                  
-ALPHABa            dipole polarisability 1 # Ba
+ALPHABa            dipole polarisability 1 # Ba 
 BDIPOBa            dipole damping b        # Ba O
 4                  dipole order            # Ba O
 CDIPBaO            dipole damping c        # Ba O
