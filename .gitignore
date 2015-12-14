@@ -1,2 +1,8 @@
 ppfit/__pycache__/*
 ppfit/*.pyc
+fitabinitio-py/configs/*/*.out*
+fitabinitio-py/configs/*/fort*
+fitabinitio-py/configs/*/potential.inpt
+fitabinitio-py/OUTPUT
+fitabinitio-py/fit.out
+fitabinitio-py/potential.inpt

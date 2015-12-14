@@ -31,7 +31,10 @@ def fitting_params_from_fitabinitioin( filename = 'fitabinitio.in' ):
 
 class Configuration:
 
-    def __init__( self, directory, runtime_file, restart_file, forces_file, dipoles_file = None, stresses_file = None, nsupercell = 1 ):
+    def __init__( self, options, species, directory, runtime_file, restart_file, forces_file, dipoles_file = None, stresses_file = None, nsupercell = 1 ):
+        self.code = options[ 'calculation' ][ 'code' ]
+        self.executable = options [ 'calculation' ][ 'exec' ]
+        self.species = species
         self.directory = directory
         self.runtime = runtime_file 
         self.restart = restart_file
@@ -55,9 +58,9 @@ class Configuration:
     def reference_stresses( self ):
         return self.training_data[ 'stresses' ].data
 
-    def run( self, code = 'pimaim', clean = True ):
-        if code == 'pimaim':
-            executable = PIMAIM_Run( self, clean = clean )
+    def run( self, clean = True ):
+        if self.code == 'pimaim':
+            executable = PIMAIM_Run( self, cmd = self.executable, clean = clean )
         else:
             sys.exit( '{} not a recognised IP code'.format( code ) )
         executable.set_up()

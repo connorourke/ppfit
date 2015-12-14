@@ -1,0 +1,53 @@
+calculation:
+    code: pimaim
+    exec: mpirun -np 16 pimaim_mpi
+
+# scaling factors for the forces, dipoles and stresses
+scaling:
+    forces: 20
+    dipoles: 15
+    stresses: 2
+
+calc_order: 0
+
+verbose: True
+
+# optimization parameters supported:
+#    CG
+#    Nelder-Mead
+#    L-BFGS-B (bounded)
+#    Particle-Swarm
+
+method: Nelder-Mead
+
+tolerance:
+    ftol: 1e-4
+    gtol: 1e-2
+    xtol: 1e-2 # xtot is available for Nelder-Mead only
+    
+maxiter: 500
+
+# step size for minimization algos like BFGS or CG
+stepsize_min: 1e-4
+
+use_basin_hopping: True
+
+# Basin hopping parameters   #
+basin_hopping:
+    calc_order: 1 # Optimization order: 0 for minimization then BH, 1 for BH then minimization
+    niter: 100 # number of BH iterations
+    method: Nelder-Mead
+    # Parameters for the minimizer used by BH
+    maxiter: 200
+    tolerance:
+        ftol: 1e-2
+        gtol: 1e-1
+        # xtot (xtol?) is available for Nelder-Mead only
+        xtol: 1e-2
+    # step size for minimization algos like BFGS or CG
+    stepsize: 1e-4
+    temperature: 5.00
+    # Recommended timestep is 1.00 for BH given that steps are provided in the PARAMS file
+    timestep: 1.00
+    # max numb of iterations at a minimum
+    niter_success: 10
