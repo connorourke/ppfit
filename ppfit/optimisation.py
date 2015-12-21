@@ -6,8 +6,18 @@ from ppfit.chi import sumOfChi
 from scipy.optimize import basinhopping, minimize
 
 class LBFGSB_Minimizer:
+    """Wrapper class for scipy.optimize.minimize( method = 'L-BFGS-B' )
+
+    Attributes:
+        options (dict of str: var): stores scipy.optimize.minimize() options
+    """
 
     def __init__( self, opts ):
+        """Initialise a LBFGSB_Minimizer object.
+
+        Args:
+            opts (ppfit.Options): Options objects with attributes { ftol_min, gtol_min, verbose, maxiter_min, stepsize_min } set.
+        """
         self.options = { 'ftol': opts[ 'tolerance' ][ 'ftol' ],
                          'gtol': opts[ 'tolerance' ][ 'gtol' ],
                          'disp': opts[ 'verbose' ],
@@ -15,6 +25,16 @@ class LBFGSB_Minimizer:
                          'eps': opts[ 'stepsize' ] }
 
     def minimize( self, function, initial_values, bounds ): # can initial values and bounds be passed in as a Fitting_Parameter_Set object?
+        """Minimize a function using scipy.optimize.minimize( method = 'L-BFGS-B' ).
+
+        Args:
+            function (function)
+            initial_values (?)
+            bounds (?)
+        Returns:
+            results_min (?)
+        Notes:
+        """
         print( 'L-BFGS-B minimisation' )
         results_min = minimize( function, initial_values, method = 'L-BFGS-B', bounds = bounds, options = self.options )
         return results_min 
