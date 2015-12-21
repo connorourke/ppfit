@@ -1,7 +1,9 @@
 import numpy as np
+import matplotlib
+matplotlib.use( 'Agg' )
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
-from ppfit.io import output
+from ppfit.inputoutput import output
 
 fmt="{0:.7f}"
 
@@ -58,20 +60,19 @@ def chi_squared( ai_vals, ff_vals, genplot, filename ):
 
 # This is the objective function evaluated by the minimization algorithms 
 class sumOfChi:
-  def __init__( self, potential_file, training_set, scaling, plot = False ):
+  def __init__( self, potential_file, training_set, scaling ):
     self.potential_file = potential_file
     self.scaling = scaling
-    self.plot = plot
     self.training_set = training_set
     self.ai_forces = training_set.forces.T
     self.ai_dipoles = training_set.dipoles.T
     self.ai_stresses = training_set.stresses.T
 
-  def evaluate( self, test_values ):
+  def evaluate( self, test_values, plot = False ):
     if type( test_values ) is not np.ndarray:
         raise TypeError
     self.potential_file.write_with_parameters( test_values )
-    ran_okay = self.training_set.run( 'pimaim' )
+    ran_okay = self.training_set.run()
     if not ran_okay:
         totalChi = 1E10
         output('Error: likely due to unphysical parameter value\n') 
@@ -81,9 +82,9 @@ class sumOfChi:
     ff_stresses = self.training_set.new_stresses.T
 
     chiSq = {}
-    chiSq[ 'forces' ]   = chi_squared( self.ai_forces, ff_forces, self.plot, 'forces-errors' )
-    chiSq[ 'dipoles' ]  = chi_squared( self.ai_dipoles, ff_dipoles, self.plot, 'dipoles-errors' )
-    chiSq[ 'stresses' ] = chi_squared( self.ai_stresses, ff_stresses, self.plot, 'stresses-errors' )
+    chiSq[ 'forces' ]   = chi_squared( self.ai_forces, ff_forces, plot, 'forces-errors' )
+    chiSq[ 'dipoles' ]  = chi_squared( self.ai_dipoles, ff_dipoles, plot, 'dipoles-errors' )
+    chiSq[ 'stresses' ] = chi_squared( self.ai_stresses, ff_stresses, plot, 'stresses-errors' )
     factorTot = sum( self.scaling.values() )
     totalChi = sum( [ self.scaling[ k ] * chiSq[ k ] for k in chiSq.keys() ] ) / factorTot
 

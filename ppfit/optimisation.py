@@ -1,7 +1,8 @@
 import sys
 import numpy as np
-from ppfit.io import read_from_file, output
+from ppfit.inputoutput import output, mkdir_p
 from ppfit.basin_hopping import MyTakeStep, WriteRestart, MyBounds
+from ppfit.chi import sumOfChi
 from scipy.optimize import basinhopping, minimize
 
 class LBFGSB_Minimizer:
@@ -17,11 +18,11 @@ class LBFGSB_Minimizer:
         Args:
             opts (ppfit.Options): Options objects with attributes { ftol_min, gtol_min, verbose, maxiter_min, stepsize_min } set.
         """
-        self.options = { 'ftol': opts.ftol_min,
-                         'gtol': opts.gtol_min,
-                         'disp': opts.verbose,
-                         'maxiter': opts.maxiter_min,
-                         'eps': opts.stepsize_min }
+        self.options = { 'ftol': opts[ 'tolerance' ][ 'ftol' ],
+                         'gtol': opts[ 'tolerance' ][ 'gtol' ],
+                         'disp': opts[ 'verbose' ],
+                         'maxiter': opts[ 'maxiter' ],
+                         'eps': opts[ 'stepsize' ] }
 
     def minimize( self, function, initial_values, bounds ): # can initial values and bounds be passed in as a Fitting_Parameter_Set object?
         """Minimize a function using scipy.optimize.minimize( method = 'L-BFGS-B' ).
@@ -41,10 +42,10 @@ class LBFGSB_Minimizer:
 class Nelder_Mead_Minimizer:
 
     def __init__( self, opts ):
-        self.options= { 'ftol': opts.ftol_min,
-                        'xtol': opts.xtol_min,
-                        'disp': opts.verbose,
-                        'maxiter': opts.maxiter_min }
+        self.options= { 'ftol': opts[ 'tolerance' ][ 'ftol' ],
+                        'xtol': opts[ 'tolerance' ][ 'xtol' ],
+                        'disp': opts[ 'verbose' ],
+                        'maxiter': opts[ 'maxiter' ] }
 
     def minimize( self, function, initial_values ):
         print( 'Nelder-Mead minimisation' )
@@ -54,59 +55,18 @@ class Nelder_Mead_Minimizer:
 class CG_Minimizer:
 
     def __init__( self, opts ):
-        self.options = { 'gtol': opts.gtol_min,
-                         'disp': opts.verbose,
-                         'maxiter': opts.maxiter_min,
-                         'eps': opts.stepsize_min }
-        self.tol = opts.ftol_min
+        self.options = { 'gtol': opts[ 'tolerance'][ 'gtol' ],
+                         'disp': opts[ 'verbose' ],
+                         'maxiter': opts[ 'maxiter' ],
+                         'eps': opts[ 'stepsize' ] }
+        self.tol = opts[ 'tolerance' ][ 'ftol' ]
 
     def minimize( self, function, initial_values ): # bounds?
         print( 'CG minimisation' )
         results_min = minimize( function, initial_values, method = 'CG', tol = self.tol, options = self.options )
         return results_min
  
-class Optimisation_Options:
-
-    def __init__( self, opt_options ):
-        self.calc_order =  int(opt_options['calc_order'])
-        self.method_min = opt_options['method_min']
-        self.ftol_min = opt_options['ftol_min']
-        self.gtol_min = opt_options['gtol_min']
-        self.xtol_min = opt_options['xtol_min']
-        self.maxiter_min = opt_options['maxiter_min']
-        self.stepsize_min = opt_options['stepsize_min']
-        self.verbose = opt_options['disp']
-        self.temperature = opt_options['temperature']
-        self.method_BH = opt_options['method_BH']    
-        self.ftol_BH = opt_options['ftol_BH']
-        self.gtol_BH = opt_options['gtol_BH']
-        self.xtol_BH = opt_options['xtol_BH']    
-        self.maxiter_BH = opt_options['maxiter_BH']
-        self.stepsize_BH = opt_options['stepsize_BH']
-        self.timestep = opt_options['timestep']
-        self.niter_BH = opt_options['niter_BH']
-        self.niter_success = opt_options['niter_success']
-        self.scalingF = opt_options['scalingF']
-        self.scalingD = opt_options['scalingD']
-        self.scalingS = opt_options['scalingS']
-
-def read_optimisation_options( options_file ):
-### Read parameters for the optimization routines
-    opt_file = read_from_file( options_file, 2, True )
-    opt_options = {}
-    for i in opt_file:
-        if str(i[0]) in ('method_min','method_BH'):
-            opt_options[i[0]] = i[1]
-        elif i[0] == 'disp':
-            opt_options[i[0]] = bool(i[1])
-        elif i[0] in ('maxiter_min','maxiter_BH','niter_success','niter_BH'):
-            opt_options[i[0]] = np.int(i[1])
-        else:
-            opt_options[i[0]] = np.float(i[1])
-    opts = Optimisation_Options( opt_options )
-    return opts
-
-def optimise( function, fitting_parameters, method, opts ):
+def optimise( function, fitting_parameters, opts ):
     tot_vars = ( fitting_parameters.to_fit + fitting_parameters.fixed ).strings
     pot_vars = fitting_parameters.to_fit.strings
     const_vars = fitting_parameters.fixed.strings
@@ -119,21 +79,23 @@ def optimise( function, fitting_parameters, method, opts ):
     pot_values_min = fitting_parameters.to_fit.min_bounds
     pot_values_max = fitting_parameters.to_fit.max_bounds
     pot_values = np.asarray( fitting_parameters.to_fit.initial_values )
-    minim_bounds = fitting_parameters.to_fit.bounds
 
     # Choose the calculation order
-    if opts.calc_order == 0: 
-        if method == 'L-BFGS-B':
+    if ( 'use_basin_hopping' not in opts.keys() or
+         opts[ 'use_basin_hopping' ] == False or
+         opts[ 'basin_hopping' ][ 'calc_order' ] == 0 ): 
+    # what happens if we are not using basin hopping?
+        if opts[ 'method' ] == 'L-BFGS-B':
             minimizer = LBFGSB_Minimizer( opts )
-            results_min = minimizer.minimize( function, pot_values, bounds )
-        elif method == 'CG':
+            results_min = minimizer.minimize( function, pot_values, bounds = fitting_parameters.to_fit.bounds )
+        elif opts[ 'method' ] == 'CG':
             minimizer = CG_Minimizer( opts )
             results_min = minimizer.minimize( function, pot_values )
-        elif method == 'Nelder-Mead':
+        elif opts[ 'method' ] == 'Nelder-Mead':
             minimizer = Nelder_Mead_Minimizer( opts )
             results_min = minimizer.minimize( function, pot_values )
         else:
-            sys.exit( 'minimization method '+method+' not supported' )
+            sys.exit( 'minimization method {} not supported'.format( opts[ 'method' ] ) )
         output( results_min.message )
         tot_values = np.concatenate((const_values,results_min.x),axis=0)
 
@@ -141,8 +103,7 @@ def optimise( function, fitting_parameters, method, opts ):
         write_Results_min = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESULTS_min')
         write_Results_min(results_min.x,results_min.fun,accepted=1)
 
-        secondSumOfChi = sumOfChi( potential_file, training_set, chi_squared_scaling, plot = True )
-        secondSumOfChi.evaluate(results_min.x)
+        function.evaluate( results_min.x, plot = True )
         mkdir_p('./min-errors-pdfs')
         os.system('mv *.pdf ./min-errors-pdfs')
 
@@ -153,53 +114,62 @@ def optimise( function, fitting_parameters, method, opts ):
 # Define variables for BH RESTART file 
     write_restart = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESTART')
 #
-    if opts.calc_order == 0:
-    # Pass the optimized values to BH
-        pot_values = results_min.x
-    # Temperature parameter for BH
-        temperature = results_min.fun * opts.temperature
-    elif opts.calc_order == 1:
-    # Temperature parameter for BH
-        temperature = function(pot_values) * opts.temperature
-    # Step sizes for BH
-    mysteps = MyTakeStep(step_sizes) 
-    output( 'The temperature is set to: '+str(temperature)+'\n' )
-# Set the options for the minimization algo in BH
-    if opts.method_BH in ('L-BFGS-B','CG'):
-        options = { 'ftol': opts.ftol_BH, 
-                    'gtol': opts.gtol_BH,
-                    'disp': opts.verbose,
-                    'maxiter': opts.maxiter_BH,
-                    'eps': opts.stepsize_BH }
-    elif opts.method_BH == 'Nelder-Mead':
-        options = { 'ftol': opts.ftol_BH, 
-                    'xtol': opts.xtol_BH,
-                    'disp': opts.verbose,
-                    'maxiter': opts.maxiter_BH}
-    else:
-        sys.exit('Minimization method '+method_BH+' not supported')
-# Bounds for BH
-    mybounds = MyBounds(pot_values_max,pot_values_min)
-    if opts.method_BH in ('L-BFGS-B'):
-        # Bounds for minimization method inside BH
-        bounds = minim_bounds
-        minimizer_kwargs = { 'method': opts.method_BH,
-                             'bounds': bounds,
-                             'options': options}
-    else:
-        minimizer_kwargs = { 'method': opts.method_BH,
-                             'options': options}
-    results_BH = basinhopping( function,pot_values,T=temperature,stepsize=opts.timestep,take_step=mysteps,minimizer_kwargs=minimizer_kwargs,disp=opts.verbose,accept_test=mybounds,niter=opts.niter_BH, callback=write_restart, 
-                               niter_success = opts.niter_success )
-    output( results_BH.message )
-    tot_values = np.concatenate((const_values,results_BH.x),axis=0)
-#
-## Write a results file for the BH part 
-    write_Results_BH = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESULTS_BH')
-    write_Results_BH( results_BH.x, results_BH.fun, accepted = 1 )
-
-    finalSumOfChi = sumOfChi( potential_file, training_set, chi_squared_scaling, plot = True )
-    finalSumOfChi.evaluate(results_BH.x)
-    mkdir_p('./BH-errors-pdfs')
-    os.system('mv *.pdf ./BH-errors-pdfs')
-    # close the output file
+    if opts[ 'use_basin_hopping' ] == True:
+        print( 'Basin Hopping' )
+        if opts[ 'basin_hopping' ]['calc_order' ] == 0:
+        # Pass the optimized values to BH
+            pot_values = results_min.x
+        # Temperature parameter for BH
+            temperature = results_min.fun * opts[ 'temperature' ]
+        elif opts[ 'basin_hopping' ]['calc_order' ] == 1:
+        # Temperature parameter for BH
+            temperature = function(pot_values) * opts[ 'basin_hopping' ][ 'temperature' ]
+        else:
+            exit( 'not recognised as basin hopping calculation order: {}'.format( opts[ 'basin_hopping' ][ 'calc_order' ] ) )
+            # Step sizes for BH
+        output( 'The temperature is set to: '+str(temperature)+'\n' )
+    # Set the options for the minimization algo in BH
+        if opts[ 'basin_hopping' ][ 'method' ] in ('L-BFGS-B','CG'):
+            options = { 'ftol': opts[ 'basin_hopping' ][ 'tolerance' ][ 'ftol' ],
+                        'gtol': opts[ 'basin_hopping' [ 'tolerance' ]][ 'gtol' ],
+                        'disp': opts[ 'verbose' ],
+                        'maxiter': opts[ 'basin_hopping' ][ 'maxiter' ],
+                        'eps': opts[ 'basin_hopping' ][ 'stepsize' ] }
+        elif opts[ 'basin_hopping' ][ 'method' ] == 'Nelder-Mead':
+            options = { 'ftol': opts[ 'basin_hopping' ][ 'tolerance' ][ 'ftol' ],
+                        'xtol': opts[ 'basin_hopping' ][ 'tolerance' ][ 'xtol' ],
+                        'disp': opts[ 'verbose' ],
+                        'maxiter': opts[ 'basin_hopping' ][ 'maxiter' ] }
+        else:
+            sys.exit('Minimization method {} not supported'.format( opts[ 'basin_hopping' ][ 'method' ] ) )
+    # Bounds for BH
+        mybounds = MyBounds(pot_values_max,pot_values_min)
+        if opts[ 'basin_hopping' ][ 'method' ] in ('L-BFGS-B'):
+            minimizer_kwargs = { 'method': opts[ 'basin_hopping' ][ 'method' ],
+                                 'bounds': fitting_parameters.to_fit.bounds,
+                                 'options': options}
+        else:
+            minimizer_kwargs = { 'method': opts[ 'basin_hopping' ][ 'method' ],
+                                 'options': options}
+        results_BH = basinhopping( function, 
+                                   x0 = pot_values,
+                                   niter = opts[ 'basin_hopping' ][ 'maxiter' ], # TODO check this
+                                   T = temperature, 
+                                   stepsize = opts[ 'basin_hopping'][ 'timestep' ],
+                                   minimizer_kwargs = minimizer_kwargs,
+                                   take_step = MyTakeStep( step_sizes ),
+                                   disp = opts[ 'verbose' ],
+                                   accept_test = mybounds,
+                                   callback = write_restart, 
+                                   niter_success = opts[ 'basin_hopping' ][ 'niter_success' ] )
+        output( results_BH.message[0] )
+        tot_values = np.concatenate((const_values,results_BH.x),axis=0)
+    #
+    ## Write a results file for the BH part 
+        write_Results_BH = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESULTS_BH')
+        write_Results_BH( results_BH.x, results_BH.fun, accepted = 1 )
+    
+        # plot should take target filenames as arguments to save having to move afterwards
+        function.evaluate( results_BH.x, plot = True )
+        mkdir_p('./BH-errors-pdfs')
+        os.system('mv *.pdf ./BH-errors-pdfs')
