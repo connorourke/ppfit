@@ -33,24 +33,23 @@ class WriteRestart:
     def write_bh_restart( self, x, f, accepted ):
         if int( accepted ) == 1: # What's wrong with `if accepted:` ? Is accepted a boolean flag?
             x = np.array(x)
-            with open( self.filename, "w") as file:
+            with open( self.filename, "w") as fl:
                 fmt="{0:.7f}"
-                file.write('# The total chi sq is: '+fmt.format(f)+'\n')
-                self.write_vars( x )
+                fl.write('# The total chi sq is: '+fmt.format(f)+'\n')
+                self.write_vars( fl, x )
 
     def write_local_restart( self, x ):
         x = np.array(x)
-        with open( self.filename, "w") as file:
-            for lineNumber,var in enumerate(self.nvars):
-                self.write_vars( file, x )
+        with open( self.filename, "w") as fl:
+            self.write_vars( fl, x )
 
-    def write_vars( self, file, x ):
+    def write_vars( self, fl, x ):
         fmt="{0:.7f}"
         for lineNumber,var in enumerate(self.nvars):
-            output = str(var)+'\t'+fmt.format((np.concatenate((self.nconst,x),axis=0))[lineNumber])+'\t'+ \
-                     str(self.zerosAndones[lineNumber])+'\t'+fmt.format(self.nmin[lineNumber])+'\t'+fmt.format(self.nmax[lineNumber])+'\t' + \
+            output = str( var ) + '\t' + fmt.format( (np.concatenate((self.nconst,x),axis=0) )[lineNumber])+'\t'+ \
+                     str( self.zerosAndones[lineNumber] )+'\t'+fmt.format(self.nmin[lineNumber])+'\t'+fmt.format(self.nmax[lineNumber])+'\t' + \
                      fmt.format(self.steps[lineNumber])+'\n'
-            file.write(output)
+            fl.write(output)
     
 
 # this routine defines the magnitude of the steps in BH - these steps are defined in PARAMS
