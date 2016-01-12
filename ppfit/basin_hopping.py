@@ -18,28 +18,40 @@ class MyBounds:
         return tmax and tmin
 
 # Routine used to write a restart file for accepted parameter sets from BH
+# TODO: This should probably be included in the Parameter_Set class, as various output methods that can be called using `callback =` during minimisation
 class WriteRestart:
 
-    def __init__(self,nvars,nconst,zerosAndones,nmin,nmax,steps,filename):
+    def __init__( self, nvars, nconst, zerosAndones, nmin, nmax, steps, filename ):
         self.nvars = nvars
         self.nconst = nconst
         self.zerosAndones = zerosAndones
         self.nmax = nmax
         self.nmin = nmin
         self.steps = steps
-        self.filename = str(filename)
+        self.filename = str( filename )
 
-    def __call__(self,x,f,accepted):
-        if int(accepted) == 1:
+    def write_bh_restart( self, x, f, accepted ):
+        if int( accepted ) == 1: # What's wrong with `if accepted:` ? Is accepted a boolean flag?
             x = np.array(x)
-            with open(self.filename, "w") as file:
+            with open( self.filename, "w") as file:
                 fmt="{0:.7f}"
                 file.write('# The total chi sq is: '+fmt.format(f)+'\n')
-                for lineNumber,var in enumerate(self.nvars):
-                    output = str(var)+'\t'+fmt.format((np.concatenate((self.nconst,x),axis=0))[lineNumber])+'\t'+ \
-                    str(self.zerosAndones[lineNumber])+'\t'+fmt.format(self.nmin[lineNumber])+'\t'+fmt.format(self.nmax[lineNumber])+'\t' + \
-                    fmt.format(self.steps[lineNumber])+'\n'
-                    file.write(output)
+                self.write_vars( x )
+
+    def write_local_restart( self, x ):
+        x = np.array(x)
+        with open( self.filename, "w") as file:
+            for lineNumber,var in enumerate(self.nvars):
+                self.write_vars( x )
+
+    def write_vars( self, x ):
+        fmt="{0:.7f}"
+        for lineNumber,var in enumerate(self.nvars):
+            output = str(var)+'\t'+fmt.format((np.concatenate((self.nconst,x),axis=0))[lineNumber])+'\t'+ \
+                     str(self.zerosAndones[lineNumber])+'\t'+fmt.format(self.nmin[lineNumber])+'\t'+fmt.format(self.nmax[lineNumber])+'\t' + \
+                     fmt.format(self.steps[lineNumber])+'\n'
+            file.write(output)
+    
 
 # this routine defines the magnitude of the steps in BH - these steps are defined in PARAMS
 class MyTakeStep:
