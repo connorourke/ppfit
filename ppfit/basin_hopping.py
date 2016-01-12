@@ -42,9 +42,9 @@ class WriteRestart:
         x = np.array(x)
         with open( self.filename, "w") as file:
             for lineNumber,var in enumerate(self.nvars):
-                self.write_vars( x )
+                self.write_vars( file, x )
 
-    def write_vars( self, x ):
+    def write_vars( self, file, x ):
         fmt="{0:.7f}"
         for lineNumber,var in enumerate(self.nvars):
             output = str(var)+'\t'+fmt.format((np.concatenate((self.nconst,x),axis=0))[lineNumber])+'\t'+ \

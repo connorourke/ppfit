@@ -150,7 +150,8 @@ def optimise( function, fitting_parameters, opts ):
                                  'options': options}
         else:
             minimizer_kwargs = { 'method': opts[ 'basin_hopping' ][ 'method' ],
-                                 'options': options}
+                                 'options': options,
+                                 'callback': write_restart.write_local_restart }
         results_BH = basinhopping( function, 
                                    x0 = pot_values,
                                    niter = opts[ 'basin_hopping' ][ 'maxiter' ], # TODO check this
@@ -160,14 +161,14 @@ def optimise( function, fitting_parameters, opts ):
                                    take_step = MyTakeStep( step_sizes ),
                                    disp = opts[ 'verbose' ],
                                    accept_test = mybounds,
-                                   callback = write_restart, 
+                                   callback = write_restart.write_bh_restart, 
                                    niter_success = opts[ 'basin_hopping' ][ 'niter_success' ] )
         output( results_BH.message[0] )
         tot_values = np.concatenate((const_values,results_BH.x),axis=0)
     #
     ## Write a results file for the BH part 
         write_Results_BH = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESULTS_BH')
-        write_Results_BH( results_BH.x, results_BH.fun, accepted = 1 )
+        write_Results_BH.write_bh_restart( results_BH.x, results_BH.fun, accepted = 1 )
     
         # plot should take target filenames as arguments to save having to move afterwards
         function.evaluate( results_BH.x, plot = True )
