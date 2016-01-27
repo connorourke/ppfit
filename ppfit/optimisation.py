@@ -1,9 +1,10 @@
 import sys
+import os
 import numpy as np
 from ppfit.inputoutput import output, mkdir_p
 from ppfit.basin_hopping import MyTakeStep, WriteRestart, MyBounds
 from ppfit.chi import sumOfChi
-from scipy.optimize import basinhopping, minimize
+from scipy.optimize import basinhopping, minimize, differential_evolution
 
 class LBFGSB_Minimizer:
     """Wrapper class for scipy.optimize.minimize( method = 'L-BFGS-B' )
@@ -65,7 +66,18 @@ class CG_Minimizer:
         print( 'CG minimisation' )
         results_min = minimize( function, initial_values, method = 'CG', tol = self.tol, options = self.options )
         return results_min
- 
+
+class Diff_Evol:
+     def __init__( self, opts ):
+        self.options = { }
+        self.tol = opts[ 'tolerance' ][ 'ftol' ]
+
+     def minimize( self, function, bounds, write_restart ):
+         print( 'Differential Evolution' )
+         print (bounds)
+         results_min = differential_evolution( function, bounds, mutation = tuple((0.5,1.5)), callback=write_restart.write_bh_restart  )
+         return results_min
+
 def optimise( function, fitting_parameters, opts ):
     tot_vars = ( fitting_parameters.to_fit + fitting_parameters.fixed ).strings
     pot_vars = fitting_parameters.to_fit.strings
@@ -79,6 +91,8 @@ def optimise( function, fitting_parameters, opts ):
     pot_values_min = fitting_parameters.to_fit.min_bounds
     pot_values_max = fitting_parameters.to_fit.max_bounds
     pot_values = np.asarray( fitting_parameters.to_fit.initial_values )
+
+    write_restart = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESTART')
 
     # Choose the calculation order
     if ( 'use_basin_hopping' not in opts.keys() or
@@ -94,6 +108,9 @@ def optimise( function, fitting_parameters, opts ):
         elif opts[ 'method' ] == 'Nelder-Mead':
             minimizer = Nelder_Mead_Minimizer( opts )
             results_min = minimizer.minimize( function, pot_values )
+        elif opts[ 'method' ] == 'Differential-Evolution':
+            minimizer = Diff_Evol( opts)
+            reults_min = minimizer.minimize( function, fitting_parameters.to_fit.bounds, write_restart)
         else:
             sys.exit( 'minimization method {} not supported'.format( opts[ 'method' ] ) )
         output( results_min.message )
@@ -101,9 +118,9 @@ def optimise( function, fitting_parameters, opts ):
 
         # Write a results file 
         write_Results_min = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESULTS_min')
-        write_Results_min(results_min.x,results_min.fun,accepted=1)
+        write_Results_min.write_bh_restart(results_min.x,results_min.fun,accepted=1)
 
-        function.evaluate( results_min.x, plot = True )
+        function( results_min.x, plot = True )
         mkdir_p('./min-errors-pdfs')
         os.system('mv *.pdf ./min-errors-pdfs')
 
@@ -129,9 +146,14 @@ def optimise( function, fitting_parameters, opts ):
             # Step sizes for BH
         output( 'The temperature is set to: '+str(temperature)+'\n' )
     # Set the options for the minimization algo in BH
-        if opts[ 'basin_hopping' ][ 'method' ] in ('L-BFGS-B','CG'):
+        if opts[ 'basin_hopping' ][ 'method' ] == 'L-BFGS-B':
             options = { 'ftol': opts[ 'basin_hopping' ][ 'tolerance' ][ 'ftol' ],
-                        'gtol': opts[ 'basin_hopping' [ 'tolerance' ]][ 'gtol' ],
+                        'gtol': opts[ 'basin_hopping' ][ 'tolerance' ][ 'gtol' ],
+                        'disp': opts[ 'verbose' ],
+                        'maxiter': opts[ 'basin_hopping' ][ 'maxiter' ],
+                        'eps': opts[ 'basin_hopping' ][ 'stepsize' ] }
+        elif opts[ 'basin_hopping' ][ 'method' ] == 'CG':
+            options = { 'gtol': opts[ 'basin_hopping' ][ 'tolerance' ][ 'gtol' ],
                         'disp': opts[ 'verbose' ],
                         'maxiter': opts[ 'basin_hopping' ][ 'maxiter' ],
                         'eps': opts[ 'basin_hopping' ][ 'stepsize' ] }
@@ -171,6 +193,6 @@ def optimise( function, fitting_parameters, opts ):
         write_Results_BH.write_bh_restart( results_BH.x, results_BH.fun, accepted = 1 )
     
         # plot should take target filenames as arguments to save having to move afterwards
-        function.evaluate( results_BH.x, plot = True )
+        function( results_BH.x, plot = True )
         mkdir_p('./BH-errors-pdfs')
         os.system('mv *.pdf ./BH-errors-pdfs')

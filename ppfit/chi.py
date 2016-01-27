@@ -7,7 +7,7 @@ from ppfit.inputoutput import output
 
 fmt="{0:.7f}"
 
-def plot( data, filename, title ):
+def plot( ai_plot, ff_plot, sqDiff, filename, title ):
     with PdfPages( '{}.pdf'.format( filename ) ) as pdf:
         f, axarr = plt.subplots(2, sharex=True)
         att1 = {'color': 'black', 'markerfacecolor': None, 'markersize': 2.5,
@@ -55,7 +55,7 @@ def chi_squared( ai_vals, ff_vals, genplot, filename ):
     if genplot:
         ai_plot = np.sqrt(ai_plot)
         ff_plot = np.sqrt(ff_plot)
-        plot( [ ai_plot, ff_plot ], filename, title = 'Difference = {}'.format( str( chiSq ) ) )
+        plot(  ai_plot, ff_plot, sqDiff, filename, title = 'Difference = {}'.format( str( chiSq ) ) )
     return chiSq
 
 # This is the objective function evaluated by the minimization algorithms 
