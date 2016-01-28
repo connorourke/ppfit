@@ -4,7 +4,7 @@ import numpy as np
 from ppfit.inputoutput import output, mkdir_p
 from ppfit.basin_hopping import MyTakeStep, WriteRestart, MyBounds
 from ppfit.chi import sumOfChi
-from scipy.optimize import basinhopping, minimize, differential_evolution
+from scipy.optimize import basinhopping, minimize
 
 class LBFGSB_Minimizer:
     """Wrapper class for scipy.optimize.minimize( method = 'L-BFGS-B' )
@@ -64,19 +64,8 @@ class CG_Minimizer:
 
     def minimize( self, function, initial_values ): # bounds?
         print( 'CG minimisation' )
-        results_min = minimize( function, initial_values, method = 'CG', tol = self.tol, options = self.options )
+        results_min = minimize( function, initial_values, method = 'CG', tol = self.tol,  options = self.options )
         return results_min
-
-class Diff_Evol:
-     def __init__( self, opts ):
-        self.options = { }
-        self.tol = opts[ 'tolerance' ][ 'ftol' ]
-
-     def minimize( self, function, bounds, write_restart ):
-         print( 'Differential Evolution' )
-         print (bounds)
-         results_min = differential_evolution( function, bounds, mutation = tuple((0.5,1.5)), callback=write_restart.write_bh_restart  )
-         return results_min
 
 def optimise( function, fitting_parameters, opts ):
     tot_vars = ( fitting_parameters.to_fit + fitting_parameters.fixed ).strings
@@ -102,18 +91,17 @@ def optimise( function, fitting_parameters, opts ):
         if opts[ 'method' ] == 'L-BFGS-B':
             minimizer = LBFGSB_Minimizer( opts )
             results_min = minimizer.minimize( function, pot_values, bounds = fitting_parameters.to_fit.bounds )
+            output( results_min.message.decode("utf-8") )
         elif opts[ 'method' ] == 'CG':
             minimizer = CG_Minimizer( opts )
             results_min = minimizer.minimize( function, pot_values )
+            output( results_min.message )
         elif opts[ 'method' ] == 'Nelder-Mead':
             minimizer = Nelder_Mead_Minimizer( opts )
             results_min = minimizer.minimize( function, pot_values )
-        elif opts[ 'method' ] == 'Differential-Evolution':
-            minimizer = Diff_Evol( opts)
-            reults_min = minimizer.minimize( function, fitting_parameters.to_fit.bounds, write_restart)
+            output( results_min.message)
         else:
             sys.exit( 'minimization method {} not supported'.format( opts[ 'method' ] ) )
-        output( results_min.message )
         tot_values = np.concatenate((const_values,results_min.x),axis=0)
 
         # Write a results file 
