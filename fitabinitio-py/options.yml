@@ -1,6 +1,6 @@
 calculation:
     code: pimaim
-    exec: mpirun -np 16 pimaim_mpi
+    exec: mpirun -np 16 ~/bin/pimaim_mpi/pimaim_mpi
 
 # scaling factors for the forces, dipoles and stresses
 scaling:
