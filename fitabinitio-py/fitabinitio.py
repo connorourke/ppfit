@@ -16,34 +16,23 @@ options = read_options( 'options.yml' )
 
 outfile = open('OUTPUT','w')
 
-config1 = Configuration( options = options,
-                         species = { 'Ba', 'Ti', 'O' },
-                         directory = 'configs/cubic/',
-                         runtime_file = 'runtime_cubic.inpt',
-                         restart_file = 'restart_cubic.dat',
-                         forces_file  = 'cubic.force',
-                         dipoles_file = 'cubic.dip', 
-                         stresses_file = 'cubic.stress' )
+config_read = read_options('configs.yml')
 
-config2 = Configuration( options = options,
-                         species = { 'Ba', 'Ti', 'O' },
-                         directory = 'configs/tet',
-                         runtime_file = 'runtime_tet.inpt',
-                         restart_file = 'restart_tet.dat',
-                         forces_file  = 'tet.force',
-                         dipoles_file = 'tet.dip', 
-                         stresses_file = 'tet.stress' )
+config=[]
 
-config3 = Configuration( options = options,
-                         species = { 'Ba', 'Ti', 'O' },
-                         directory = 'configs/rhombo',
-                         runtime_file = 'runtime_rhombo.inpt',
-                         restart_file = 'restart_rhombo.dat',
-                         forces_file  = 'rhombo.force',
-                         dipoles_file = 'rhombo.dip', 
-                         stresses_file = 'rhombo.stress' )
+for dict_name, value in config_read.items():
+    config.append( Configuration( options = options,
+                         species = config_read[str(dict_name)]["species"],
+                         directory = config_read[str(dict_name)]["directory"],
+                         runtime_file = config_read[str(dict_name)]["runtime_file"],
+                         restart_file = config_read[str(dict_name)]["restart_file"],
+                         forces_file  = config_read[str(dict_name)]["forces_file"],
+                         dipoles_file = config_read[str(dict_name)]["dipoles_file"],
+                         stresses_file = config_read[str(dict_name)]["stresses_file"] ))
 
-training_set = Training_Set( [ config1, config2, config3 ] )
+
+training_set = Training_Set(config )
+
 fitting_parameters = Fitting_Parameter_Set.from_parameters_file( 'PARAMS' )
 potential_file = Potential_File( 'template_BaTiO3', fitting_parameters )
 
