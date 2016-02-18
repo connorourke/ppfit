@@ -59,25 +59,15 @@ class Configuration:
         return self.training_data[ 'stresses' ].data
 
     @classmethod
-    def configuration_from_dict( cls, dict, dict_name, options):
+    def from_dict( cls, dict, options):
          return cls(options = options,
-                         species = dict[str(dict_name)]["species"],
-                         directory = dict[str(dict_name)]["directory"],
-                         runtime_file = dict[str(dict_name)]["runtime_file"],
-                         restart_file = dict[str(dict_name)]["restart_file"],
-                         forces_file  = dict[str(dict_name)]["forces_file"],
-                         dipoles_file = dict[str(dict_name)]["dipoles_file"],
-                         stresses_file = dict[str(dict_name)]["stresses_file"] )
-
-
-#         return cls(options = options,
-#                         species = dict[dict_name]["species"],
-#                         directory = dict[dict_name]["directory"],
-#                         runtime_file = dict[dict_name]["runtime_file"],
-#                         restart_file = dict[dict_name]["restart_file"],
-#                         forces_file  = dict[dict_name]["forces_file"],
-#                         dipoles_file = dict[dict_name]["dipoles_file"],
-#                         stresses_file = dict[dict_name]["stresses_file"] )
+                         species = dict["species"],
+                         directory = dict["directory"],
+                         runtime_file = dict["runtime_file"],
+                         restart_file = dict["restart_file"],
+                         forces_file  = dict["forces_file"],
+                         dipoles_file = dict["dipoles_file"],
+                         stresses_file = dict["stresses_file"] )
 
     def run( self, clean = True ):
         if self.code == 'pimaim':

@@ -18,9 +18,9 @@ outfile = open('OUTPUT','w')
 
 config_read = read_options('configs.yml')
 
-config=[Configuration.configuration_from_dict(config_read, str(dict_name), options) for dict_name,value in config_read.items()]
+configs=[ Configuration.from_dict( config, options) for config in config_read.values()]
 
-training_set = Training_Set(config )
+training_set = Training_Set(configs )
 
 fitting_parameters = Fitting_Parameter_Set.from_parameters_file( 'PARAMS' )
 potential_file = Potential_File( 'template_BaTiO3', fitting_parameters )
