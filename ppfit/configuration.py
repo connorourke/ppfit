@@ -59,15 +59,15 @@ class Configuration:
         return self.training_data[ 'stresses' ].data
 
     @classmethod
-    def from_dict( cls, dict, options):
+    def from_dict( cls, config, options):
          return cls(options = options,
-                         species = dict["species"],
-                         directory = dict["directory"],
-                         runtime_file = dict["runtime_file"],
-                         restart_file = dict["restart_file"],
-                         forces_file  = dict["forces_file"],
-                         dipoles_file = dict["dipoles_file"],
-                         stresses_file = dict["stresses_file"] )
+                         species = config["species"],
+                         directory = config["directory"],
+                         runtime_file = config["runtime_file"],
+                         restart_file = config["restart_file"],
+                         forces_file  = config["forces_file"],
+                         dipoles_file = config["dipoles_file"],
+                         stresses_file = config["stresses_file"] )
 
     def run( self, clean = True ):
         if self.code == 'pimaim':
