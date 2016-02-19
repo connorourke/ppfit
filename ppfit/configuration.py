@@ -60,15 +60,15 @@ class Configuration:
 
     @classmethod
     def from_dict( cls, config, options):
-    '''
-    Returns configugration object given config and options dicts
+        '''
+           Returns configugration object given config and options dicts
 
-    Args:
-        config:  dictionary containing the configuration from configs.yml
-        options: dictionary containing the options from options.yml
-    Returns:
-        configuration object
-    ''' 
+        Args:
+           config:  dictionary containing the configuration from configs.yml
+           options: dictionary containing the options from options.yml
+        Returns:
+           configuration object
+        ''' 
         return cls(options = options,
                          species = config["species"],
                          directory = config["directory"],
