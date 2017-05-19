@@ -22,7 +22,6 @@ class PIMAIM_Run:
         self.configuration = configuration
         self.parent = parent
         self.clean = clean
-        self.common_input_dir = 'common_input'
         self.cwd = os.getcwd()
         self.ran_okay = None
 
@@ -59,8 +58,6 @@ class PIMAIM_Run:
             os.remove( f )
 
     def collect_data( self ):
-#        cwd = os.getcwd()
-       #need this for mpi version, but not serial.....
         os.chdir(self.configuration.directory)
         self.configuration.new_forces = np.loadtxt( 'forces.out' )[0::self.configuration.nsupercell]
         number_of_ions = self.configuration.new_forces.shape[0]

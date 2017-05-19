@@ -28,6 +28,17 @@ export I_MPI_FALLBACK=yes
 module load anaconda3/2.5.0
 module load intel/mpi/64/5.1.3.210
 
+# automatically set up host file:
+
+srun hostname -s | sort -u > slurm.hosts
+echo $SLURM_NNODES
+
+for ((i=0; i<=£SLURM_NNODES; i++)); do
+  echo ":16">>proc
+done
+paste slurm.hosts proc > temp
+awk '{print $1$2}' temp > slurm.hosts
+
 #mpi4py:
 mpiexec.hydra -genv I_MPI_FABRICS=dapl,ofa,tcp,tmi,ofi --rr --map-by node --bind-to node -f slurm.hosts -np 33 python3 ./fitabinitio.py
 #serial & pool:
