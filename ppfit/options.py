@@ -1,6 +1,21 @@
 import yaml
 import re
 
+class Options:
+    def __init__( self, options ):
+        self.code = options[ 'calculation' ][ 'code' ]
+        self.executable = options [ 'calculation' ][ 'exec' ]
+        self.code_mpi = options [ 'calculation' ][ 'code_mpi']
+        self.mpi_exec = options [ 'calculation' ][ 'mpi_exec']
+        self.mpi_np = options[ 'calculation' ][ 'mpi_np' ]
+        self.run_configs = options[ 'calculation' ][ 'run_configs' ]
+        self.exec_proc = options[ 'calculation' ][ 'exec_proc' ]
+        self.cpu_node = options[ 'calculation' ][ 'no_cpu_node']
+        self.mpi_opts = options[ 'calculation' ][ 'mpi_options' ]
+        self.no_nodes = options[ 'calculation' ][ 'no_nodes' ]
+        self.exec_tot_proc = int(self.no_nodes)*(self.cpu_node)
+        self.no_workers = options['calculation' ][ 'no_slaves']
+
 def read_options( filename ):
     """Reads in the options file in YAML format
 
@@ -25,6 +40,6 @@ def read_options( filename ):
         |\\.(?:nan|NaN|NAN))$''', re.X),
         list(u'-+0123456789.'))
 
-    config = yaml.load( open( filename ), Loader = loader )
-    return config    
+    options = yaml.load( open( filename ), Loader = loader )
+    return options    
 
