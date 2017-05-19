@@ -49,7 +49,7 @@ class LBFGSB_Minimizer:
            stop=[0]
            results_min = minimize( function, initial_values, args=stop, method = 'L-BFGS-B', bounds = bounds, options = self.options, callback= callback)
            stop=[1]
-           function(initial_values_values, stop)
+           function(initial_values, stop)
         else:
            stop=[0]
            while stop[0]==0:
@@ -73,7 +73,7 @@ class Nelder_Mead_Minimizer:
            stop=[0]
            results_min = minimize( function, initial_values, args=stop, method = 'Nelder-Mead', options = self.options , callback= callback)
            stop=[1]
-           function(initial_values_values, stop)
+           function(initial_values, stop)
         else:
            stop=[0]
            while stop[0]==0:
@@ -95,7 +95,7 @@ class CG_Minimizer:
            stop=[0]
            results_min = minimize( function, initial_values, args=stop, method = 'CG', tol = self.tol, options = self.options , callback= callback)
            stop=[1]
-           function(initial_values_values, stop)
+           function(initial_values, stop)
         else:
            stop=[0]
            while stop[0]==0:
