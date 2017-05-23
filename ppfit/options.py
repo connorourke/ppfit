@@ -10,11 +10,11 @@ class Options:
         self.mpi_np = options[ 'calculation' ][ 'mpi_np' ]
         self.run_configs = options[ 'calculation' ][ 'run_configs' ]
         self.exec_proc = options[ 'calculation' ][ 'exec_proc' ]
-        self.cpu_node = options[ 'calculation' ][ 'no_cpu_node']
         self.mpi_opts = options[ 'calculation' ][ 'mpi_options' ]
-        self.no_nodes = options[ 'calculation' ][ 'no_nodes' ]
-        self.exec_tot_proc = int(self.no_nodes)*(self.cpu_node)
-        self.no_workers = options['calculation' ][ 'no_slaves']
+        if self.run_configs == 'mpi4py':
+           self.cpu_node = options[ 'calculation' ][ 'no_cpu_node']
+           self.no_nodes = options[ 'calculation' ][ 'no_nodes' ]
+           self.no_workers = options['calculation' ][ 'no_slaves']
 
 def read_options( filename ):
     """Reads in the options file in YAML format
