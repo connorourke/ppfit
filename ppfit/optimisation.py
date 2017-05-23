@@ -4,7 +4,7 @@ import numpy as np
 from ppfit.inputoutput import output, mkdir_p
 from ppfit.basin_hopping import MyTakeStep, WriteRestart, MyBounds
 from ppfit.chi import sumOfChi
-from scipy.optimize import basinhopping, minimize
+from scipy.optimize import basinhopping, minimize, OptimizeResult
 
 from mpi4py import MPI
 
@@ -52,9 +52,11 @@ class LBFGSB_Minimizer:
            function(initial_values, stop)
         else:
            stop=[0]
+           results_min = OptimizeResult()
            while stop[0]==0:
               function(initial_values, stop)
-           results_min = 0
+
+        results_min = comm.bcast(results_min, root=0)
 
         return results_min
 
@@ -68,7 +70,6 @@ class Nelder_Mead_Minimizer:
                         'maxiter': opts['maxiter'] }
 
     def minimize( self, function, initial_values, callback, **options):
-        print( 'Nelder-Mead minimisation in minimize wrapper' )
         if rank == 0:
            stop=[0]
            results_min = minimize( function, initial_values, args=stop, method = 'Nelder-Mead', options = self.options , callback= callback)
@@ -76,9 +77,12 @@ class Nelder_Mead_Minimizer:
            function(initial_values, stop)
         else:
            stop=[0]
+           results_min = OptimizeResult()
            while stop[0]==0:
               function(initial_values, stop)
-           results_min = 0
+          
+        results_min = comm.bcast(results_min, root=0)  
+        
         return results_min
 
 class CG_Minimizer:
@@ -98,9 +102,12 @@ class CG_Minimizer:
            function(initial_values, stop)
         else:
            stop=[0]
+           results_min = OptimizeResult()
            while stop[0]==0:
               function(initial_values, stop)
-           results_min = 0
+
+        results_min = comm.bcast(results_min, root=0)
+
         return results_min
 
 def optimise( function, fitting_parameters, opts ):
@@ -140,19 +147,23 @@ def optimise( function, fitting_parameters, opts ):
             results_min = minimizer.minimize( function, pot_values, callback =  write_restart.write_local_restart)
             if rank ==0:
                output( results_min.message)
+            
         else:
             sys.exit( 'minimization method {} not supported'.format( opts[ 'method' ] ) )
-
+       
         # Write a results file
         if rank == 0: 
            tot_values = np.concatenate((const_values,results_min.x),axis=0)
            write_Results_min = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESULTS_min')
            write_Results_min.write_bh_restart(results_min.x,results_min.fun,accepted=1)
+        
+        stop=[0]
+        function(results_min.x, stop, plot = True)
 
-           function( results_min.x, plot = True )
+        if rank == 0:
            mkdir_p('./min-errors-pdfs')
            os.system('mv *.pdf ./min-errors-pdfs')
-
+ 
 ########################################################################################
 # basin hopping part using the minimization parameters as a starting guess             #
 # The temperature should be a fraction of the final function value from the minimizer  #
@@ -174,6 +185,8 @@ def optimise( function, fitting_parameters, opts ):
         # Temperature parameter for BH
             if rank == 0:
                temperature =  function(pot_values,stop) * opts[ 'basin_hopping' ][ 'temperature' ]
+            else: 
+               function(pot_values, stop)
         else:
             exit( 'not recognised as basin hopping calculation order: {}'.format( opts[ 'basin_hopping' ][ 'calc_order' ] ) )
             # Step sizes for BH
@@ -202,20 +215,21 @@ def optimise( function, fitting_parameters, opts ):
     # Bounds for BH
         mybounds = MyBounds(pot_values_max,pot_values_min)
         if opts[ 'basin_hopping' ][ 'method' ] in ('L-BFGS-B'):
+            stop=[0]
             minimizer_kwargs = { 'method': opts[ 'basin_hopping' ][ 'method' ],
                                  'bounds': fitting_parameters.to_fit.bounds,
                                  'options': options,
-                                 'callback':  write_restart.write_local_restart}
+                                 'callback':  write_restart.write_local_restart,
+                                 'args': stop}
         else:
             minimizer = Nelder_Mead_Minimizer( opts )
-            minimizer_kwargs = { 'method': minimizer.minimize,
+            stop=[0]
+            minimizer_kwargs = { 'method': opts['basin_hopping']['method'],
                                  'options': options,
-                                 'callback': write_restart.write_local_restart} 
+                                 'callback': write_restart.write_local_restart,
+                                 'args': stop} 
 
-        
         if rank == 0:
-           stop=[0]
-           
            results_BH = basinhopping( function,
                                    x0 = pot_values,
                                    niter = opts[ 'basin_hopping' ][ 'niter' ], # TODO check this
@@ -231,19 +245,26 @@ def optimise( function, fitting_parameters, opts ):
            function(pot_values, stop)
         else:
            stop=[0]
+           results_BH = OptimizeResult()
            while stop[0]==0:
               function(pot_values, stop)
+        
+        results_BH = comm.bcast(results_BH, root=0)
 
         if rank ==0:
            output( results_BH.message[0] )
            tot_values = np.concatenate((const_values,results_BH.x),axis=0)
-    #
-    ## Write a results file for the BH part 
+        ## Write a results file for the BH part 
            write_Results_BH = WriteRestart(tot_vars,const_values,to_fit_and_not,tot_values_min,tot_values_max,all_step_sizes,'RESULTS_BH')
            write_Results_BH.write_bh_restart( results_BH.x, results_BH.fun, accepted = 1 )
     
         # plot should take target filenames as arguments to save having to move afterwards
-           function( results_BH.x, plot = True )
+       
+        stop=[0]
+        function( results_BH.x, stop, plot = True )
+        
+        if rank == 0:
            mkdir_p('./BH-errors-pdfs')
            os.system('mv *.pdf ./BH-errors-pdfs')
-
+         
+        #

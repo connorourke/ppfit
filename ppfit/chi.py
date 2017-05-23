@@ -113,9 +113,7 @@ class sumOfChi:
         output( 'Total chi sq (no factors): ' + fmt.format( np.mean( list( chiSq.values() ) ) ) + '\n' )
         output('Total chi sq: '+fmt.format(totalChi)+'\n')
         output('\n')
-        print("forces",ff_forces)
         return totalChi
     else :
-       print("function call finished", stop)
-       return totalChi
+       output( 'function call finished on rank ',rank + '\n')
 
