@@ -4,9 +4,12 @@ import re
 import os
 from shutil import copyfile
 from glob import glob
+from mpi4py import MPI
 from ppfit.fitting_parameter import Fitting_Parameter
 from ppfit.fitting_data import Forces_Data, Dipoles_Data, Stresses_Data
 from ppfit.pimaim_calc import PIMAIM_Run
+from socket import gethostname
+
 
 import numpy as np
 
@@ -32,11 +35,11 @@ def fitting_params_from_fitabinitioin( filename = 'fitabinitio.in' ):
 class Configuration:
 
     def __init__( self, options, species, directory, runtime_file, restart_file, forces_file, dipoles_file = None, stresses_file = None, nsupercell = 1 ):
-        self.code = options[ 'calculation' ][ 'code' ]
-        self.executable = options [ 'calculation' ][ 'exec' ]
+        self.options = options
         self.species = species
-        self.directory = directory
-        self.runtime = runtime_file 
+        self.parent = os.getcwd()
+        self.directory = os.path.join( self.parent, directory )
+        self.runtime = runtime_file
         self.restart = restart_file
         self.training_data = {}
         self.training_data[ 'forces' ] = Forces_Data.load( os.path.join( self.directory, forces_file ) )
@@ -45,6 +48,12 @@ class Configuration:
         if stresses_file:
             self.training_data[ 'stresses' ] = Stresses_Data.load( os.path.join( self.directory, stresses_file ) )
         self.nsupercell = nsupercell
+
+        if self.options.code == 'pimaim':
+            self.executable = PIMAIM_Run( self, os.getcwd(), clean = True )
+        else:
+            sys.exit( '{} not a recognised IP code'.format( code ) )
+
 
     @property
     def reference_forces( self ):
@@ -59,7 +68,7 @@ class Configuration:
         return self.training_data[ 'stresses' ].data
 
     @classmethod
-    def from_dict( cls, config, options):
+    def from_dict( cls,  options, config):
         '''
            Returns configugration object given config and options dicts
 
@@ -69,7 +78,7 @@ class Configuration:
         Returns:
            configuration object
         ''' 
-        return cls(options = options,
+        return cls(      options = options,
                          species = config["species"],
                          directory = config["directory"],
                          runtime_file = config["runtime_file"],
@@ -78,13 +87,11 @@ class Configuration:
                          dipoles_file = config["dipoles_file"],
                          stresses_file = config["stresses_file"] )
 
-    def run( self, clean = True ):
-        if self.code == 'pimaim':
-            executable = PIMAIM_Run( self, cmd = self.executable, clean = clean )
-        else:
-            sys.exit( '{} not a recognised IP code'.format( code ) )
-        executable.set_up()
-        executable.run()
-        executable.collect_data()
-        executable.tear_down()
-        return executable.ran_okay
+    def run( self, clean = True):
+        self.executable.set_up()
+        self.executable.run()
+        return self.executable.ran_okay
+
+    def collect_data( self, clean = True ):
+        self.executable.collect_data()
+#        self.executable.tear_down()

@@ -1,8 +1,11 @@
 import numpy as np
 import os
+import sys
 from shutil import copyfile
 from glob import glob
 import re
+from socket import gethostname
+
 
 def include_in_potential_file( line, species ):
     if not re.search( '#', line ):
@@ -15,52 +18,60 @@ def include_in_potential_file( line, species ):
 
 class PIMAIM_Run:
 
-    def __init__( self, configuration, cmd, clean = True ):
+    def __init__( self, configuration, parent, clean = True ):
         self.configuration = configuration
-        self.cmd = cmd
+        self.parent = parent
         self.clean = clean
-        self.common_input_dir = 'common_input'
         self.cwd = os.getcwd()
         self.ran_okay = None
 
     def set_up( self ):
+         
+        if self.configuration.options.code_mpi == True:
+         self.cmd=self.configuration.options.mpi_exec + ' ' + self.configuration.options.mpi_opts + ' ' + self.parent+ '/' + gethostname() + ' ' + str(self.configuration.options.mpi_np) +' '+ str(self.configuration.options.exec_proc) + ' ' +self.configuration.options.executable
+        else:
+            self.cmd=self.options.executable
+
         with open( 'potential.inpt' ) as f:
             lines = f.readlines()
-        new_potential_file = os.path.join( self.configuration.directory, 'potential.inpt' ) 
+        new_potential_file = os.path.join( self.configuration.directory, 'potential.inpt' )
         with open( new_potential_file, 'w' ) as f:
-            [ f.write( l )for l in lines if include_in_potential_file( l, self.configuration.species ) ] 
-        for f in os.listdir( self.common_input_dir ):
-            copyfile( os.path.join( self.common_input_dir, f ), os.path.join( self.configuration.directory, f ) )
-        os.chdir( self.configuration.directory )
+            [ f.write( l )for l in lines if include_in_potential_file( l, self.configuration.species ) ]
+        
         self.clean_dir()
-        copyfile( self.configuration.runtime, 'runtime.inpt' )
-        copyfile( self.configuration.restart, 'restart.dat' )
-        return self 
+        return self
 
     def run( self ):
-        os.system( '{} > out.out'.format( self.cmd ) )
-        cg_error = 'cg failed to converge' in open( 'out.out' ).read()
+        os.chdir(self.configuration.directory)
+        os.system( '{} > OUT.OUT'.format( self.cmd ) )
+        cg_error = 'cg failed to converge' in open( 'OUT.OUT' ).read()
         if cg_error:
             self.ran_okay = False
         self.ran_okay = True
+        #this needs commenting for mpi
+        os.chdir(self.parent)
     
-    def collect_data( self ):
-        self.configuration.new_forces = np.loadtxt( 'forces.out' )[0::self.configuration.nsupercell]
-        number_of_ions = self.configuration.new_forces.shape[0]
-        self.configuration.new_dipoles = np.loadtxt( 'dipoles.out' )[0:number_of_ions:self.configuration.nsupercell]
-        diag_stresses = np.loadtxt( 'xxyyzzstress.out' )[1:4]
-        off_diag_stresses = np.loadtxt( 'xyxzyzstress.out' )[1:4]
-        self.configuration.new_stresses = np.concatenate( ( diag_stresses, off_diag_stresses ) )
-        # TODO How should the stress tensors be treated if we have a supercell
-
     def clean_dir( self ):
+        os.chdir(self.configuration.directory)
         to_delete = glob( '*out*' ) + glob( '*.fort' )
         for f in to_delete:
             os.remove( f )
 
+    def collect_data( self ):
+        os.chdir(self.configuration.directory)
+        self.configuration.new_forces = np.loadtxt( 'forces.out' )[0::self.configuration.nsupercell]
+        number_of_ions = self.configuration.new_forces.shape[0]
+        self.configuration.new_dipoles = np.loadtxt( 'dipoles.out' )[0:number_of_ions:self.configuration.nsupercell]
+
+        diag_stresses = np.loadtxt( 'xxyyzzstress.out' )[1:4]
+        off_diag_stresses = np.loadtxt( 'xyxzyzstress.out' )[1:4]
+        self.configuration.new_stresses = np.concatenate( ( diag_stresses, off_diag_stresses ) )
+        os.chdir(self.configuration.parent)
+         
+        # TODO How should the stress tensors be treated if we have a supercell
+
     def tear_down( self ):
         if self.clean:
             self.clean_dir()
-        os.chdir( self.cwd )
         
 
