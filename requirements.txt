@@ -1,0 +1,4 @@
+numpy
+matplotlib
+PyYAML
+coverage==4.3.4
