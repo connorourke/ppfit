@@ -13,12 +13,13 @@ rank = MPI.COMM_WORLD.Get_rank()
 class Training_Set:
 
     def __init__( self, configurations, options ):
+        self.options = options
         self.configurations = configurations
         self.forces   = np.concatenate( [ c.reference_forces   for c in configurations ] )
-        self.dipoles  = np.concatenate( [ c.reference_dipoles  for c in configurations ] )
+        if self.options.dipoles:
+            self.dipoles  = np.concatenate( [ c.reference_dipoles  for c in configurations ] )
         self.stresses = np.concatenate( [ c.reference_stresses for c in configurations ] )
         self.cwd = os.getcwd()
-        self.options  = options
 
         if self.options.run_configs == 'mpi4py':
            if rank < self.options.no_nodes :
@@ -113,7 +114,8 @@ class Training_Set:
 
     @property
     def new_dipoles( self ):
-        return np.concatenate( [ c.new_dipoles for c in self.configurations ], axis = 0 )
+        if self.options.dipoles:
+            return np.concatenate( [ c.new_dipoles for c in self.configurations ], axis = 0 )
 
     @property
     def new_stresses( self ):

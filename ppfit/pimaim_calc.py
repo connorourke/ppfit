@@ -61,7 +61,8 @@ class PIMAIM_Run:
         os.chdir(self.configuration.directory)
         self.configuration.new_forces = np.loadtxt( 'forces.out' )[0::self.configuration.nsupercell]
         number_of_ions = self.configuration.new_forces.shape[0]
-        self.configuration.new_dipoles = np.loadtxt( 'dipoles.out' )[0:number_of_ions:self.configuration.nsupercell]
+        if self.configuration.options.dipoles:
+            self.configuration.new_dipoles = np.loadtxt( 'dipoles.out' )[0:number_of_ions:self.configuration.nsupercell]
 
         diag_stresses = np.loadtxt( 'xxyyzzstress.out' )[1:4]
         off_diag_stresses = np.loadtxt( 'xyxzyzstress.out' )[1:4]

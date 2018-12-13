@@ -43,7 +43,7 @@ class Configuration:
         self.restart = restart_file
         self.training_data = {}
         self.training_data[ 'forces' ] = Forces_Data.load( os.path.join( self.directory, forces_file ) )
-        if dipoles_file:
+        if self.options.dipoles:
             self.training_data[ 'dipoles' ] = Dipoles_Data.load( os.path.join( self.directory, dipoles_file ) )
         if stresses_file:
             self.training_data[ 'stresses' ] = Stresses_Data.load( os.path.join( self.directory, stresses_file ) )
@@ -61,7 +61,8 @@ class Configuration:
 
     @property
     def reference_dipoles( self ):
-        return self.training_data[ 'dipoles' ].data
+        if self.options.dipoles:
+            return self.training_data[ 'dipoles' ].data
 
     @property
     def reference_stresses( self ):
@@ -78,14 +79,24 @@ class Configuration:
         Returns:
            configuration object
         ''' 
-        return cls(      options = options,
-                         species = config["species"],
-                         directory = config["directory"],
-                         runtime_file = config["runtime_file"],
-                         restart_file = config["restart_file"],
-                         forces_file  = config["forces_file"],
-                         dipoles_file = config["dipoles_file"],
-                         stresses_file = config["stresses_file"] )
+        if options.dipoles:
+            return cls(      options = options,
+                             species = config["species"],
+                             directory = config["directory"],
+                             runtime_file = config["runtime_file"],
+                             restart_file = config["restart_file"],
+                             forces_file  = config["forces_file"],
+                             dipoles_file = config["dipoles_file"],
+                             stresses_file = config["stresses_file"])
+        else:
+            return cls(      options = options,
+                             species = config["species"],
+                             directory = config["directory"],
+                             runtime_file = config["runtime_file"],
+                             restart_file = config["restart_file"],
+                             forces_file  = config["forces_file"],
+                             dipoles_file = None,
+                             stresses_file = config["stresses_file"])
 
     def run( self, clean = True):
         self.executable.set_up()

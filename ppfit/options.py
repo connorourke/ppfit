@@ -11,6 +11,8 @@ class Options:
         self.run_configs = options[ 'calculation' ][ 'run_configs' ]
         self.exec_proc = options[ 'calculation' ][ 'exec_proc' ]
         self.mpi_opts = options[ 'calculation' ][ 'mpi_options' ]
+        self.dipoles = options['calculation']['dipoles']
+        
         if self.run_configs == 'mpi4py':
            self.cpu_node = options[ 'calculation' ][ 'no_cpu_node']
            self.no_nodes = options[ 'calculation' ][ 'no_nodes' ]
