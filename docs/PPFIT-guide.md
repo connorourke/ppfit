@@ -118,13 +118,13 @@ Next generate a set of thermally distorted structures from our training set of r
 
 For a good potential we want suitably large forces, dipoles etc so pick a high temperature (without actually melting the crystal....).
 
-Once each structure is equilibrated we can take a snapshot during MD as our thermally distorted training set structure
+Once each structure is equilibrated we can take a snapshot during MD as our thermally distorted training set structure.
 
 ### Getting Forces, Dipoles and Stresses
 
 Once you have a set of structures you wish to generate a training set for, it is on to actually getting the forces, dipoles and stresses out for each structure. 
 
-The dipoles are calculated from maximally-located Wannier functions using the [wannier90](http://wannier.org/) code. There are two ways of using the code - either standalone, or as a library which plugs directly into VASP. The library which plugs into VASP is useful, but no longer maintained and as far as I have found will only work with the intel compilers.
+The dipoles are calculated from maximally-located Wannier functions using the [wannier90](http://wannier.org/) code. There are two ways of using the code - either standalone, or as a library which plugs directly into VASP. The library which plugs into VASP is useful, but no longer maintained and as far as I have found **will only work with the intel compilers**.
 
 There is a version of VASP on Balena which has been linked to wannier90. Example run_script for wannier90 linked VASP on Balena:
 
